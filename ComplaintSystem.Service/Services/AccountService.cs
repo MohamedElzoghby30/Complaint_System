@@ -43,12 +43,12 @@ namespace ComplaintSystem.Service.Services
             if (!result.Succeeded)
                 return (false, result.Errors.Select(e => e.Description).ToArray());
 
-            //if (!await _userRepository.RoleExistsAsync("Complainer"))
-            //    return (false, new[] { "Complainer role doesn't exist." });
+            if (!await _userRepository.RoleExistsAsync("Complainer"))
+               return (false, new[] { "Complainer role doesn't exist." });
 
-            //var roleResult = await _userRepository.AddToRoleAsync(user, "Complainer");
-            //if (!roleResult.Succeeded)
-            //    return (false, roleResult.Errors.Select(e => e.Description).ToArray());
+            var roleResult = await _userRepository.AddToRoleAsync(user, "Complainer");
+            if (!roleResult.Succeeded)
+              return (false, roleResult.Errors.Select(e => e.Description).ToArray());
 
             return (true, Array.Empty<string>());
         }

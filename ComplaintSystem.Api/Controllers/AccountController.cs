@@ -60,13 +60,13 @@ namespace ComplaintSystem.API.Controllers
 
             if (!result.Succeeded)
                 return Unauthorized("Invalid credentials.");
-            // var roles = await _userManager.GetRolesAsync(user);
+             var roles = await _userManager.GetRolesAsync(user);
             var jwtToken = await _tokenService.CreateToken(user, _userManager);
             var token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
             Console.WriteLine(token);
             return Ok(new { token });
         }
-        [Authorize]
+        [Authorize(Roles = "Complainer")]
         [HttpGet("test")]
         public IActionResult test()
         {

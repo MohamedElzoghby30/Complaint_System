@@ -1,5 +1,6 @@
 ﻿using ComplaintSystem.Core.Repository.Contract;
 using ComplaintSystem.Core.Serveice.Contract;
+using ComplaintSystem.Repo.Repository;
 using ComplaintSystem.Repository.Repository;
 using ComplaintSystem.Service.Services;
 using EasyComplaint.Core.DTOs;
@@ -19,6 +20,9 @@ namespace ComplaintSystem.Api.Extension
             services.AddScoped<Token>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IComplaintRepository, ComplaintRepository>();
+            services.AddScoped<IComplaintService, ComplaintService>();
+           
 
             return services;
         }
