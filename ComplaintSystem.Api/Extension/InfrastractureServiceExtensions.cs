@@ -24,7 +24,9 @@ namespace ComplaintSystem.Api.Extension
             services.AddScoped<IComplaintService, ComplaintService>();
             services.AddScoped<IComplaintTypeRepository, ComplaintTypeRepository>();
             services.AddScoped<IComplaintTypeService, ComplaintTypeService>();
-         
+            services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+            services.AddScoped<IDepartmentService, DepartmentService>();
+
 
 
             return services;
