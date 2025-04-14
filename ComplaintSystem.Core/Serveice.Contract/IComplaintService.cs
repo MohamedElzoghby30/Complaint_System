@@ -10,5 +10,6 @@ namespace ComplaintSystem.Core.Serveice.Contract
     public interface IComplaintService
     {
         Task<(bool Succeeded, string[] Errors)> CreateComplaintAsync(ComplaintDTO complaintDto, int userId);
+        Task<IEnumerable<ComplaintDTO>> GetComplaintsForUserAsync(int userId);
     }
 }

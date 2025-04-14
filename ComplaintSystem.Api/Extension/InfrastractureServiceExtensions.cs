@@ -22,7 +22,10 @@ namespace ComplaintSystem.Api.Extension
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IComplaintRepository, ComplaintRepository>();
             services.AddScoped<IComplaintService, ComplaintService>();
-           
+            services.AddScoped<IComplaintTypeRepository, ComplaintTypeRepository>();
+            services.AddScoped<IComplaintTypeService, ComplaintTypeService>();
+         
+
 
             return services;
         }

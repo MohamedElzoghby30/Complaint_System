@@ -50,5 +50,17 @@ namespace ComplaintSystem.Service.Services
             await _complaintRepository.AddAsync(complaint);
             return (true, Array.Empty<string>());
         }
+        public async Task<IEnumerable<ComplaintDTO>> GetComplaintsForUserAsync(int userId)
+        {
+            var complaints = await _complaintRepository.GetByUserIdAsync(userId);
+
+            return complaints.Select(c => new ComplaintDTO
+            {
+                ComplaintTypeID = c.ComplaintTypeID,
+                Description = c.Description,
+
+
+            });
+        }
     }
 }

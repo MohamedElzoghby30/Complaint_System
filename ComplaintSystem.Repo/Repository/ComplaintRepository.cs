@@ -32,5 +32,11 @@ namespace ComplaintSystem.Repo.Repository
                 .Where(w => w.ComplaintTypeID == complaintTypeId && w.StepOrder == 1)
                 .FirstOrDefaultAsync();
         }
+        public async Task<IEnumerable<Complaint>> GetByUserIdAsync(int userId)
+        {
+            return await _context.Complaints
+                .Where(c => c.UserID == userId)
+                .ToListAsync();
+        }
     }
 }
