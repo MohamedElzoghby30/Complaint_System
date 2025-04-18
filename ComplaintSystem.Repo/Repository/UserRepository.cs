@@ -1,6 +1,8 @@
 ﻿using ComplaintSystem.Core.Entities;
 using ComplaintSystem.Core.Repository.Contract;
+using ComplaintSystem.Repo.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace ComplaintSystem.Repository.Repository
 {
@@ -9,13 +11,16 @@ namespace ComplaintSystem.Repository.Repository
 
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<Role> _roleManager;
+        private readonly ApplicationDbContext _context;
 
-        public UserRepository(UserManager<ApplicationUser> userManager, RoleManager<Role> roleManager)
+        public UserRepository(UserManager<ApplicationUser> userManager, RoleManager<Role> roleManager, ApplicationDbContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _context = context;
         }
 
+        public async Task<Department> IsDepartmentValid(int DeptId) => await _context.Departments.FirstOrDefaultAsync(x=> x.Id == DeptId);
         public Task<ApplicationUser> FindByEmailAsync(string email) => _userManager.FindByEmailAsync(email);
         public Task<bool> CheckPasswordAsync(ApplicationUser user, string password) => _userManager.CheckPasswordAsync(user, password);
         public Task<IdentityResult> CreateAsync(ApplicationUser user, string password) => _userManager.CreateAsync(user, password);

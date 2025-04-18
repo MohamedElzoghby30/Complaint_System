@@ -1,4 +1,5 @@
 ﻿using ComplaintSystem.Core.DTOs;
+using ComplaintSystem.Core.Entities;
 using ComplaintSystem.Core.Serveice.Contract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -21,7 +22,7 @@ namespace ComplaintSystem.Api.Controllers
 
         [Authorize(Roles = "Complainer")]
         [HttpPost("createComplaint")]
-        public async Task<IActionResult> CreateComplaint([FromBody] ComplaintDTO complaintDto)
+        public async Task<IActionResult> CreateComplaint([FromBody] AddComplaintDTO complaintDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(new { Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
@@ -36,7 +37,7 @@ namespace ComplaintSystem.Api.Controllers
         }
         [HttpGet("MyComplaints")]
         [Authorize(Roles = "Complainer")]
-        public async Task<IActionResult> GetMyComplaints()
+        public async Task<ActionResult<IEnumerable<ComplaintDTO>>> GetMyComplaints()
         {
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
             if (userIdClaim == null)
@@ -47,9 +48,25 @@ namespace ComplaintSystem.Api.Controllers
             var complaints = await _complaintService.GetComplaintsForUserAsync(userId);
             return Ok(complaints);
         }
+        [HttpGet("GetComplaintByID")]
+        [Authorize(Roles = "Complainer")]
+        public async Task<IActionResult> GetComplaint(int id)
+        {
+          //  var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+            if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId) || userId == 0) 
+                return Unauthorized();
+
+            var complaint = await _complaintService.GetComplaintAsync(id, userId);
+
+            if (complaint == null)
+                return NotFound(new { message = "Complaint not found or not yours." });
+
+            return Ok(complaint);
+        }
         [HttpPost("AddComplaintType")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AddComplaintType([FromBody] ComplaintTypeDTO complaintTypeDTO)
+        public async Task<ActionResult<ComplaintTypeDTO>> AddComplaintType([FromBody] ComplaintTypeDTO complaintTypeDTO)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -59,7 +76,7 @@ namespace ComplaintSystem.Api.Controllers
 
         [HttpGet("GetAllComplaintType")]
         [Authorize]
-        public async Task<IActionResult> GetAll()
+        public async Task<ActionResult<IEnumerable<ComplaintTypeDTO>>> GetAll()
         {
             var list = await _complaintTypeService.GetAllComplaintTypesAsync();
             return Ok(list);

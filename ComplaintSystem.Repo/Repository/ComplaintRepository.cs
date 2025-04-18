@@ -1,4 +1,5 @@
-﻿using ComplaintSystem.Core.Entities;
+﻿using ComplaintSystem.Core.DTOs;
+using ComplaintSystem.Core.Entities;
 using ComplaintSystem.Core.Repository.Contract;
 using ComplaintSystem.Repo.Data;
 using Microsoft.EntityFrameworkCore;
@@ -35,8 +36,19 @@ namespace ComplaintSystem.Repo.Repository
         public async Task<IEnumerable<Complaint>> GetByUserIdAsync(int userId)
         {
             return await _context.Complaints
+                .Include(c => c.ComplaintType)
+                .Include(c=>c.User)
                 .Where(c => c.UserID == userId)
                 .ToListAsync();
         }
+        public async Task<Complaint> GetComplaintByIdAsync(int id, int userId)
+        {
+            return await _context.Complaints
+                .Include(c => c.User)
+                .Include(c => c.ComplaintType)
+                .Include(c => c.Comments)
+                .FirstOrDefaultAsync(x => x.Id == id && x.UserID == userId);
+        }
+
     }
 }

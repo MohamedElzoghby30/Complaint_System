@@ -21,7 +21,7 @@ namespace ComplaintSystem.Service.Services
           //  _mapper = mapper;
         }
 
-        public async Task<(bool Succeeded, string[] Errors)> CreateComplaintAsync(ComplaintDTO complaintDto, int userId)
+        public async Task<(bool Succeeded, string[] Errors)> CreateComplaintAsync(AddComplaintDTO complaintDto, int userId)
         {
             if (string.IsNullOrWhiteSpace(complaintDto.Description))
                 return (false, new[] { "Description is required." });
@@ -56,11 +56,35 @@ namespace ComplaintSystem.Service.Services
 
             return complaints.Select(c => new ComplaintDTO
             {
-                ComplaintTypeID = c.ComplaintTypeID,
+                Id = c.Id,
+                Status = c.Status,
                 Description = c.Description,
-
-
+                ComplaintTypeName = c.ComplaintType?.TypeName,
+                ComplaintTypeID = c.ComplaintTypeID,
+                User = new UserInfoDTO
+                {
+                    FullName = c.User?.FullName,
+                    Email = c.User?.Email
+                }
             });
+        }
+        public async Task<ComplaintDTO> GetComplaintAsync(int id, int userId)
+        {
+            var complaintDB = await _complaintRepository.GetComplaintByIdAsync(id, userId);
+            if (complaintDB == null) return null;
+
+            return new ComplaintDTO
+            {
+                Id = complaintDB.Id,
+                Status = complaintDB.Status,
+                Description = complaintDB.Description,
+                ComplaintTypeName = complaintDB.ComplaintType?.TypeName,
+                User = new UserInfoDTO
+                  {
+                      FullName = complaintDB.User?.FullName,
+                      Email = complaintDB.User?.Email
+                  }
+            };
         }
     }
 }

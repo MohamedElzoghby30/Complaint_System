@@ -28,9 +28,10 @@ namespace ComplaintSystem.Service.Services
         public async Task<(bool Succeeded, string[] Errors)> RegisterAsync(RegestrationDTO model)
         {
             var existingUser = await _userRepository.FindByEmailAsync(model.Email);
-            if (existingUser != null)
+            if (existingUser!=null)
                 return (false, new[] { "Email already exists." });
-
+            if (_userRepository.IsDepartmentValid(model.DepartmentID) != null)
+                return (false, new[] { "This Department Not Found" });
             //  var user = _mapper.Map<ApplicationUser>(model);
             var user = new ApplicationUser
             {
@@ -62,31 +63,9 @@ namespace ComplaintSystem.Service.Services
         //    var roles = await _userRepository.GetRolesAsync(user);
         //    var token = await _tokenService.CreateToken(user, _userManager);
 
-        //    return (token, Array.Empty<string>());
+        //    return (token.ToString(), Array.Empty<string>());
         //}
-        //private string GenerateJwtToken(User user, IList<string> roles)
-        //{
-        //    var claims = new List<Claim>
-        //    {
-        //        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        //        new Claim(ClaimTypes.Email, user.Email),
-        //        new Claim(ClaimTypes.Name, user.FullName)
-        //    };
-        //    claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
-
-        //    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-        //    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        //    var token = new JwtSecurityToken
-        //    (
-        //        issuer: _configuration["Jwt:Issuer"],
-        //        audience: _configuration["Jwt:Audience"],
-        //        claims: claims,
-        //        expires: DateTime.Now.AddHours(5),
-        //        signingCredentials: creds
-        //    );
-
-        //    return new JwtSecurityTokenHandler().WriteToken(token);
-        //}
+       
     }
 }
 

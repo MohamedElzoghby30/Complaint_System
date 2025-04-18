@@ -14,6 +14,7 @@ namespace ComplaintSystem.Core.Repository.Contract
         Task<bool> ComplaintTypeExistsAsync(int complaintTypeId);
         Task<Workflow> GetFirstWorkflowAsync(int complaintTypeId);
         Task<IEnumerable<Complaint>> GetByUserIdAsync(int userId);
+        Task<Complaint> GetComplaintByIdAsync(int id, int userId);
 
 
     }

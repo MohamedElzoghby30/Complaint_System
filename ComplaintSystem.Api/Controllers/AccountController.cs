@@ -54,24 +54,19 @@ namespace ComplaintSystem.API.Controllers
             var user = await _userManager.FindByEmailAsync(model.Email);
 
             if (user == null)
-                return Unauthorized("User not found.");
+                return Unauthorized("User not registered.");
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
 
             if (!result.Succeeded)
-                return Unauthorized("Invalid credentials.");
+                return Unauthorized("The Passworrd is Not Valid");
              var roles = await _userManager.GetRolesAsync(user);
             var jwtToken = await _tokenService.CreateToken(user, _userManager);
             var token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
             Console.WriteLine(token);
             return Ok(new { token });
         }
-        [Authorize(Roles = "Complainer")]
-        [HttpGet("test")]
-        public IActionResult test()
-        {
-            return Ok(new { Success = true });
-        }
+       
     }
     //  [HttpPost("login")]
 

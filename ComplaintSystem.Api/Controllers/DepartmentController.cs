@@ -16,9 +16,9 @@ namespace ComplaintSystem.Api.Controllers
             _departmentService = service;
         }
 
-        [HttpPost("Create-DepartMent")]
+        [HttpPost("Create-Department")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateDepartment([FromBody] DepartmentDTO dto)
+        public async Task<ActionResult<DepartmentDTO>> CreateDepartment([FromBody] DepartmentDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -28,14 +28,14 @@ namespace ComplaintSystem.Api.Controllers
         }
 
         [HttpGet("Get-All-Department")]
-        public async Task<IActionResult> GetAllDepartments()
+        public async Task<ActionResult<IEnumerable<DepartmentDTO>>> GetAllDepartments()
         {
             var result = await _departmentService.GetAllAsync();
             return Ok(result);
         }
         [HttpPut("Update-Department")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Update( [FromBody] DepartmentDTO dto)
+        public async Task<ActionResult<DepartmentDTO>> Update( [FromBody] DepartmentDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

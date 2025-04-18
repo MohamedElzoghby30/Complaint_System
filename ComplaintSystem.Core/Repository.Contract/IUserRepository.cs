@@ -6,6 +6,7 @@ namespace ComplaintSystem.Core.Repository.Contract
     public interface IUserRepository
     {
         Task<ApplicationUser> FindByEmailAsync(string email);
+        Task<Department> IsDepartmentValid(int deptId);
         Task<bool> CheckPasswordAsync(ApplicationUser user, string password);
         Task<IdentityResult> CreateAsync(ApplicationUser user, string password);
         Task<bool> RoleExistsAsync(string role);

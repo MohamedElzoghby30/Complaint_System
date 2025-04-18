@@ -42,8 +42,10 @@ namespace ComplaintSystem.Service.Services
 
             return list.Select(x => new ComplaintTypeDTO
             {
+                Id = x.Id,
                 TypeName = x.TypeName,
-                DepartmentID = x.DepartmentID
+                DepartmentID = x.DepartmentID,
+                DepartmentName=x.Department.DepartmentName
             });
         }
     }
