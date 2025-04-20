@@ -44,6 +44,7 @@ namespace ComplaintSystem.Api
 
             var app = builder.Build();
             app.DefaultDataSeeding();
+            app.UseMiddleware<ExceptionMiddleware>();
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
                 app.UseSwaggerGenForDevelopment();
