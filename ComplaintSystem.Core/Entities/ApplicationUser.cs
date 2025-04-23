@@ -18,6 +18,7 @@ namespace ComplaintSystem.Core.Entities
         public int DepartmentID { get; set; }
         [ForeignKey("DepartmentID")]
         public Department Department { get; set; }
+        public ICollection<CommentComplainer>? CommentsComplainer { get; set; }
         public ICollection<Complaint>? Complaints { get; set; } = new List<Complaint>();
         public ICollection<Complaint>? AssignedComplaints { get; set; } = new List<Complaint>();
     }

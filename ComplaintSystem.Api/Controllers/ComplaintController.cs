@@ -1,4 +1,5 @@
-﻿using ComplaintSystem.Core.DTOs;
+﻿using ComplaintSystem.Api.Extension;
+using ComplaintSystem.Core.DTOs;
 using ComplaintSystem.Core.Entities;
 using ComplaintSystem.Core.Serveice.Contract;
 using Microsoft.AspNetCore.Authorization;
@@ -33,20 +34,29 @@ namespace ComplaintSystem.Api.Controllers
             if (!succeeded)
                 return BadRequest(new { Errors = errors });
 
-            return Ok(new { Message = "Complaint created successfully!" });
+            return Ok();
         }
         [HttpGet("MyComplaints")]
         [Authorize(Roles = "Complainer")]
-        public async Task<ActionResult<IEnumerable<ComplaintDTO>>> GetMyComplaints()
+        public async Task<ActionResult<IEnumerable<ComplaintDTO>>> GetMyComplaints([FromQuery] string? status)
         {
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
             if (userIdClaim == null)
                 return Unauthorized();
 
             int userId = int.Parse(userIdClaim.Value);
+            if (status == null/*||status.ToUpper() != "Pending".ToUpper()|| status.ToUpper() != "InProgress".ToUpper() || status.ToUpper() != "Resolved".ToUpper()*/)
+            {
+                var complaints = await _complaintService.GetComplaintsForUserAsync(userId);
+                return Ok(complaints);
+            }
+            else
+            {
+                var complaints = await _complaintService.GetComplaintsForUserAsync(userId,status);
+                return Ok(complaints);
+            }
 
-            var complaints = await _complaintService.GetComplaintsForUserAsync(userId);
-            return Ok(complaints);
+           
         }
         [HttpGet("GetComplaintByID")]
         [Authorize(Roles = "Complainer")]
@@ -64,15 +74,7 @@ namespace ComplaintSystem.Api.Controllers
 
             return Ok(complaint);
         }
-        [HttpPost("AddComplaintType")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<ComplaintTypeDTO>> AddComplaintType([FromBody] ComplaintTypeDTO complaintTypeDTO)
-        {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
-            var result = await _complaintTypeService.AddComplaintTypeAsync(complaintTypeDTO);
-            return Ok(new { message = "Added successfully", data = result });
-        }
+       
 
         [HttpGet("GetAllComplaintType")]
         [Authorize]

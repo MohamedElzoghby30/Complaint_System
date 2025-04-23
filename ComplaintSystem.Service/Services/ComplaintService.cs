@@ -68,6 +68,24 @@ namespace ComplaintSystem.Service.Services
                 }
             });
         }
+        public async Task<IEnumerable<ComplaintDTO>> GetComplaintsForUserAsync(int userId,string status)
+        {
+            var complaints = await _complaintRepository.GetByUserIdAsync(userId, status);
+
+            return complaints.Select(c => new ComplaintDTO
+            {
+                Id = c.Id,
+                Status = c.Status,
+                Description = c.Description,
+                ComplaintTypeName = c.ComplaintType?.TypeName,
+                ComplaintTypeID = c.ComplaintTypeID,
+                User = new UserInfoDTO
+                {
+                    FullName = c.User?.FullName,
+                    Email = c.User?.Email
+                }
+            });
+        }
         public async Task<ComplaintDTO> GetComplaintAsync(int id, int userId)
         {
             var complaintDB = await _complaintRepository.GetComplaintByIdAsync(id, userId);

@@ -38,6 +38,8 @@ namespace ComplaintSystem.Core.Entities
         public ApplicationUser? AssignedTo { get; set; }
 
         public DateTime? AssignedAt { get; set; }
+        public Rating? Rating { get; set; }
+        public ICollection<CommentComplainer>? CommentsComplainer { get; set; }
 
         public ICollection<ComplaintParticipant> Participants { get; set; } = new List<ComplaintParticipant>();
         public ICollection<Comment>? Comments { get; set; } = new List<Comment>();

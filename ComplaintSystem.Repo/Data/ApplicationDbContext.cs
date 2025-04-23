@@ -30,7 +30,10 @@ namespace ComplaintSystem.Repo.Data
         public DbSet<ComplaintType> ComplaintTypes { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Workflow> Workflows { get; set; }
+        public DbSet<Rating> Ratings { get; set; }
+        public DbSet<CommentComplainer> CommentComplainers { get; set; }
 
-    
+
+
     }
 }

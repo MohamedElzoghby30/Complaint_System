@@ -4,6 +4,7 @@ using ComplaintSystem.Repo.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ComplaintSystem.Repo.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250423193034_RatingTable")]
+    partial class RatingTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -129,37 +132,6 @@ namespace ComplaintSystem.Repo.Migrations
                     b.HasIndex("ParticipantID");
 
                     b.ToTable("Comments");
-                });
-
-            modelBuilder.Entity("ComplaintSystem.Core.Entities.CommentComplainer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CommentText")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<int>("ComplaintID")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ComplaintID");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("CommentComplainers");
                 });
 
             modelBuilder.Entity("ComplaintSystem.Core.Entities.Complaint", b =>
@@ -506,25 +478,6 @@ namespace ComplaintSystem.Repo.Migrations
                     b.Navigation("Participant");
                 });
 
-            modelBuilder.Entity("ComplaintSystem.Core.Entities.CommentComplainer", b =>
-                {
-                    b.HasOne("ComplaintSystem.Core.Entities.Complaint", "Complaint")
-                        .WithMany("CommentsComplainer")
-                        .HasForeignKey("ComplaintID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ComplaintSystem.Core.Entities.ApplicationUser", "User")
-                        .WithMany("CommentsComplainer")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Complaint");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("ComplaintSystem.Core.Entities.Complaint", b =>
                 {
                     b.HasOne("ComplaintSystem.Core.Entities.ApplicationUser", "AssignedTo")
@@ -696,16 +649,12 @@ namespace ComplaintSystem.Repo.Migrations
                 {
                     b.Navigation("AssignedComplaints");
 
-                    b.Navigation("CommentsComplainer");
-
                     b.Navigation("Complaints");
                 });
 
             modelBuilder.Entity("ComplaintSystem.Core.Entities.Complaint", b =>
                 {
                     b.Navigation("Comments");
-
-                    b.Navigation("CommentsComplainer");
 
                     b.Navigation("Participants");
 
