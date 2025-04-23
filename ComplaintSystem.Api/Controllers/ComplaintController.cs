@@ -2,6 +2,7 @@
 using ComplaintSystem.Core.DTOs;
 using ComplaintSystem.Core.Entities;
 using ComplaintSystem.Core.Serveice.Contract;
+using ComplaintSystem.Service.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,10 +16,12 @@ namespace ComplaintSystem.Api.Controllers
     {
         private readonly IComplaintService _complaintService;
         private readonly IComplaintTypeService _complaintTypeService;
-        public ComplaintController(IComplaintService complaintService, IComplaintTypeService complaintTypeService)
+        private readonly IRatingService _ratingService;
+        public ComplaintController(IComplaintService complaintService, IComplaintTypeService complaintTypeService, IRatingService ratingService)
         {
             _complaintService = complaintService;
             _complaintTypeService = complaintTypeService;
+            _ratingService = ratingService;
         }
 
         [Authorize(Roles = "Complainer")]
@@ -82,6 +85,22 @@ namespace ComplaintSystem.Api.Controllers
         {
             var list = await _complaintTypeService.GetAllComplaintTypesAsync();
             return Ok(list);
+        }
+        [HttpPost("AddRating")]
+        [Authorize(Roles = "Complainer")]
+        public async Task<IActionResult> CreateRating([FromBody] CreateRatingDTO dto)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return Unauthorized();
+
+            int userId = int.Parse(userIdClaim.Value);
+
+            var result = await _ratingService.CreateRatingAsync(userId, dto);
+            if (!result)
+                return BadRequest("The complaint is not yours or has already been evaluated.");
+
+            return Ok("Successfully evaluated");
         }
     }
 }
