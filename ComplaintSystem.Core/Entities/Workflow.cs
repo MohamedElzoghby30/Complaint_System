@@ -13,13 +13,16 @@ namespace ComplaintSystem.Core.Entities
         public int ComplaintTypeID { get; set; }
         [ForeignKey("ComplaintTypeID")]
         public ComplaintType ComplaintType { get; set; }
-        public int StepOrder { get; set; }
+        public int? StepOrder { get; set; }
         public int? NextStepID { get; set; }
         [ForeignKey("NextStepID")]
         public Workflow? NextStep { get; set; }
-        public int RoleID { get; set; }
-        [ForeignKey("RoleID")]
-        public Role Role { get; set; }
+        public int? UserId { get; set; }  
+        [ForeignKey("UserId")]
+        public ApplicationUser? User { get; set; }
+        //public int RoleID { get; set; }
+        //[ForeignKey("RoleID")]
+        //public Role Role { get; set; }
         public ICollection<Complaint>? Complaints { get; set; } = new List<Complaint>();
     }
 }

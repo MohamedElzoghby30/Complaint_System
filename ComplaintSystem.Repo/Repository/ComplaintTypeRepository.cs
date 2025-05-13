@@ -2,12 +2,6 @@
 using ComplaintSystem.Core.Repository.Contract;
 using ComplaintSystem.Repo.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace ComplaintSystem.Repo.Repository
 {
     public class ComplaintTypeRepository : IComplaintTypeRepository
@@ -29,6 +23,12 @@ namespace ComplaintSystem.Repo.Repository
         public async Task<IEnumerable<ComplaintType>> GetAllAsync()
         {
             return await _context.ComplaintTypes.Include(c => c.Department).ToListAsync();
+        }
+
+        public async Task<ComplaintType> GetComplaintTypeByIdAsync(int ComplaintTypeId)
+        {
+            return  _context.ComplaintTypes.Include(x => x.Workflows).FirstOrDefault(x=>x.Id==ComplaintTypeId);
+                
         }
     }
 }

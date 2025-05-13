@@ -16,8 +16,8 @@ namespace ComplaintSystem.Core.DTOs
         [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters.")]
         public string Password { get; set; }
 
-        [Required(ErrorMessage = "Department ID is required.")]
-        public int DepartmentID { get; set; }
+        //[Required(ErrorMessage = "Department ID is required.")]
+        //public int DepartmentID { get; set; }
         [Compare("Password", ErrorMessage = "Passwords do not match.")]
         public string ConfirmPassword { get; set; }
     }

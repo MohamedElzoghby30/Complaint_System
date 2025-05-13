@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static ComplaintSystem.Core.DTOs.ComplaintTypeDTO;
 
 namespace ComplaintSystem.Service.Services
 {
@@ -36,11 +37,11 @@ namespace ComplaintSystem.Service.Services
             };
         }
 
-        public async Task<IEnumerable<ComplaintTypeDTO>> GetAllComplaintTypesAsync()
+        public async Task<IEnumerable<GetComplaintTypeDTO>> GetAllComplaintTypesAsync()
         {
             var list = await _repo.GetAllAsync();
 
-            return list.Select(x => new ComplaintTypeDTO
+            return list.Select(x => new GetComplaintTypeDTO
             {
                 Id = x.Id,
                 TypeName = x.TypeName,

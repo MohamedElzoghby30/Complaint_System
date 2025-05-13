@@ -30,15 +30,15 @@ namespace ComplaintSystem.Service.Services
             var existingUser = await _userRepository.FindByEmailAsync(model.Email);
             if (existingUser!=null)
                 return (false, new[] { "Email already exists." });
-            if (_userRepository.IsDepartmentValid(model.DepartmentID) == null)
-                return (false, new[] { "This Department Not Found" });
+            //if (_userRepository.IsDepartmentValid(model.DepartmentID) == null)
+            //    return (false, new[] { "This Department Not Found" });
             //  var user = _mapper.Map<ApplicationUser>(model);
             var user = new ApplicationUser
             {
                 UserName = model.Email,
                 Email = model.Email,
                 FullName = model.FullName,
-                DepartmentID = model.DepartmentID,
+               // DepartmentID = model.DepartmentID,
             };
             var result = await _userRepository.CreateAsync(user, model.Password);
             if (!result.Succeeded)

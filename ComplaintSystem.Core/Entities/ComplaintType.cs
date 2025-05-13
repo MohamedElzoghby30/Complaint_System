@@ -19,7 +19,7 @@ namespace ComplaintSystem.Core.Entities
 
         [ForeignKey("DepartmentID")]
         public Department Department { get; set; }
-        public ICollection<Workflow> Workflows { get; set; } = new List<Workflow>();
+        public ICollection<Workflow>? Workflows { get; set; } = new List<Workflow>();
         public ICollection<Complaint>? Complaints { get; set; } = new List<Complaint>();
     }
 }

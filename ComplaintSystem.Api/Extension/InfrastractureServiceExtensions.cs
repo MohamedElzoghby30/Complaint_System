@@ -5,6 +5,7 @@ using ComplaintSystem.Repository.Repository;
 using ComplaintSystem.Service.Services;
 using EasyComplaint.Core.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ComplaintSystem.Api.Extension
 {
@@ -28,6 +29,10 @@ namespace ComplaintSystem.Api.Extension
             services.AddScoped<IDepartmentService, DepartmentService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<IWorkflowService, WorkflowService>();
+            services.AddScoped<IWorkflowRepo, WorkflowRepo>();
+            services.AddScoped<IRatingService, RatingService>();
+            services.AddScoped<IRatingRepository, RatingRepository>();
 
 
 

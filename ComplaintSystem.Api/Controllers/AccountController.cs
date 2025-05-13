@@ -7,6 +7,8 @@ using ComplaintSystem.Core.Entities;
 using ComplaintSystem.Core.Serveice.Contract;
 using ComplaintSystem.Core.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using ComplaintSystem.Service.Services;
+using System.Security.Claims;
 
 namespace ComplaintSystem.API.Controllers
 {
@@ -20,7 +22,8 @@ namespace ComplaintSystem.API.Controllers
         private readonly RoleManager<Role> _roleManager;
         private readonly Token _tokenService;
         private readonly IAccountService _accountService;
-        public AccountController(IAccountService accountService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, Token tokenService, IConfiguration configuration, RoleManager<Role> roleManager)
+        private readonly IRoleService _roleService;
+        public AccountController(IAccountService accountService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, Token tokenService, IConfiguration configuration, RoleManager<Role> roleManager, IRoleService roleService)
         {
             _accountService = accountService;
             _userManager = userManager;
@@ -28,6 +31,7 @@ namespace ComplaintSystem.API.Controllers
             _configuration = configuration;
             _roleManager = roleManager;
             _tokenService = tokenService;
+            _roleService = roleService;
         }
 
         [HttpPost("register")]
@@ -66,7 +70,104 @@ namespace ComplaintSystem.API.Controllers
             Console.WriteLine(token);
             return Ok(new { token });
         }
-       
+
+        [HttpGet("GetAllRoles")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<IEnumerable<RolesDTO>>> GetAllRoles()
+        {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return Unauthorized();
+            var roles = await _roleService.GetAllRolesAsync();
+
+            if (!roles.Any())
+                return NotFound(new { message = "No roles found." });
+
+            return Ok(roles);
+        }
+        [HttpPut("UpdateRole")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateRole([FromBody] RolesDTO dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _roleService.UpdateRoleAsync(dto);
+            if (!result)
+                return NotFound(new { message = "Role not found." });
+
+            return Ok(new { message = "Role updated successfully." });
+        }
+        [HttpPost("CreateUserWithRole")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CreateUserWithRole([FromBody] CreateUserWithRoleDTO dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var (success, error) = await _roleService.CreateUserAndAssignRoleAsync(dto);
+            if (!success)
+                return BadRequest(new { message = error });
+
+            return Ok(new { message = "User created and added to role successfully." });
+        }
+        [HttpPost("AddUserToRole")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AddUserToRole([FromBody] AddUserToRoleDTO dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var (success, error) = await _roleService.AddUserToRoleAsync(dto);
+            if (!success)
+                return BadRequest(new { message = error });
+
+            return Ok(new { message = "User added to role successfully." });
+        }
+        [HttpPut("DisableUser")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DisableUser([FromQuery] string email)
+        {
+            var result = await _roleService.DisableUserByEmailAsync(email);
+            if (!result)
+                return NotFound("User not found or error occurred.");
+
+            return Ok("User disabled successfully.");
+        }
+        [HttpPut("EnableUser")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> EnableUser([FromQuery] string email)
+        {
+            var result = await _roleService.EnableUserByEmailAsync(email);
+            if (!result)
+                return NotFound("User not found or error occurred.");
+
+            return Ok("User enabled successfully.");
+        }
+        [HttpPut("Change-Password")]
+        [Authorize]
+        public async Task<IActionResult> ChanagePassworrd(ChangePassDTO changePassDTO)
+        {
+           if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+            if (changePassDTO.NewPassword != changePassDTO.NewPasswordConform)
+                return BadRequest(new { Message = "Passwords do not match" });
+
+            var userEmailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+            var user = await _userManager.FindByEmailAsync(userEmailClaim.Value);
+            if (user == null)
+                return NotFound("User not found.");
+            else 
+            {
+                var result = await _userManager.ChangePasswordAsync(user, changePassDTO.lastPassword, changePassDTO.NewPassword);
+                if (!result.Succeeded)
+                    return BadRequest(result.Errors);
+
+                return Ok("Password changed successfully.");
+            }
+
+        }
+
     }
     //  [HttpPost("login")]
 

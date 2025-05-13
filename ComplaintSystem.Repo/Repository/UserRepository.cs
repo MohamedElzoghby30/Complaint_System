@@ -20,7 +20,7 @@ namespace ComplaintSystem.Repository.Repository
             _context = context;
         }
 
-        public async Task<Department> IsDepartmentValid(int DeptId) => await _context.Departments.FirstOrDefaultAsync(x=> x.Id == DeptId);
+     //   public async Task<Department> IsDepartmentValid(int DeptId) => await _context.Departments.FirstOrDefaultAsync(x=> x.Id == DeptId);
         public Task<ApplicationUser> FindByEmailAsync(string email) => _userManager.FindByEmailAsync(email);
         public Task<bool> CheckPasswordAsync(ApplicationUser user, string password) => _userManager.CheckPasswordAsync(user, password);
         public Task<IdentityResult> CreateAsync(ApplicationUser user, string password) => _userManager.CreateAsync(user, password);

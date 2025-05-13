@@ -15,10 +15,11 @@ namespace ComplaintSystem.Core.Entities
         [Required(ErrorMessage = "Full name is required.")]
         [StringLength(200, MinimumLength = 1, ErrorMessage = "Full name must be between 1 and 200 characters.")]
         public string FullName { get; set; }
-        public int DepartmentID { get; set; }
+        public int? DepartmentID { get; set; }
         [ForeignKey("DepartmentID")]
-        public Department Department { get; set; }
-        public ICollection<CommentComplainer>? CommentsComplainer { get; set; }
+        public Department? Department { get; set; }
+        public ICollection<Workflow>? Workflows { get; set; } = new List<Workflow>();
+        public ICollection<CommentComplainer>? CommentsComplainer { get; set; }= new List<CommentComplainer>();
         public ICollection<Complaint>? Complaints { get; set; } = new List<Complaint>();
         public ICollection<Complaint>? AssignedComplaints { get; set; } = new List<Complaint>();
     }

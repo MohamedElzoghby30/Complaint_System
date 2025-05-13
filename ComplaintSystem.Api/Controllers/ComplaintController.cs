@@ -6,6 +6,7 @@ using ComplaintSystem.Service.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Security.Claims;
 
 namespace ComplaintSystem.Api.Controllers
@@ -51,11 +52,21 @@ namespace ComplaintSystem.Api.Controllers
             if (status == null/*||status.ToUpper() != "Pending".ToUpper()|| status.ToUpper() != "InProgress".ToUpper() || status.ToUpper() != "Resolved".ToUpper()*/)
             {
                 var complaints = await _complaintService.GetComplaintsForUserAsync(userId);
-                return Ok(complaints);
+                var list = complaints.ToList();
+               // var page = new PaginatedList<ComplaintDTO>(list, list.Count(), 1, list.Count());
+                var x= PaginatedList<ComplaintDTO>.CreateAsync(complaints, 1, 2);
+                return Ok(new {x.Result.Items , x.Result.Count,x.Result.HasPreviousPage,x.Result.HasNextPage});
             }
             else
             {
                 var complaints = await _complaintService.GetComplaintsForUserAsync(userId,status);
+               
+       
+
+               
+
+
+
                 return Ok(complaints);
             }
 

@@ -10,6 +10,7 @@ namespace ComplaintSystem.Core.Repository.Contract
     public interface IComplaintTypeRepository
     {
         Task<ComplaintType> AddAsync(ComplaintType complaintType);
+        Task<ComplaintType> GetComplaintTypeByIdAsync(int ComplaintTypeId);
         Task<IEnumerable<ComplaintType>> GetAllAsync();
     }
 }

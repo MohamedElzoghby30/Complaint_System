@@ -1,11 +1,6 @@
 ﻿using ComplaintSystem.Core.Entities;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ComplaintSystem.Repo.Data.Configrations
 {
@@ -20,22 +15,33 @@ namespace ComplaintSystem.Repo.Data.Configrations
                    .IsRequired()
                    .HasMaxLength(100);
 
-            // تعيين العلاقة مع NextStep
+          
             builder.HasOne(w => w.NextStep)
                    .WithMany()
                    .HasForeignKey(w => w.NextStepID)
                    .OnDelete(DeleteBehavior.Restrict);
 
-            // تعيين العلاقة مع Role
-            builder.HasOne(w => w.Role)
-                   .WithMany()
-                   .HasForeignKey(w => w.RoleID)
+
+            builder.HasOne(w => w.ComplaintType)
+                   .WithMany(ct => ct.Workflows)
+                   .HasForeignKey(w => w.ComplaintTypeID)
                    .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(w => w.User)
+                   .WithMany(u => u.Workflows)
+                   .HasForeignKey(w => w.UserId)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            //// تعيين العلاقة مع Role
+            //builder.HasOne(w => w.Role)
+            //       .WithMany()
+            //       .HasForeignKey(w => w.RoleID)
+            //       .OnDelete(DeleteBehavior.Restrict);
             //علاقه مع Complaint
             builder.HasMany(w => w.Complaints)
-                 .WithOne(c => c.CurrentStep)
-                 .HasForeignKey(c => c.CurrentStepID)
-                 .OnDelete(DeleteBehavior.SetNull);
+                   .WithOne(c => c.CurrentStep)
+                   .HasForeignKey(c => c.CurrentStepID)
+                   .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

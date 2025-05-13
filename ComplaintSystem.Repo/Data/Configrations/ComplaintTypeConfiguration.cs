@@ -31,11 +31,12 @@ namespace ComplaintSystem.Repo.Data.Configrations
                    .WithOne(c => c.ComplaintType)
                    .HasForeignKey(c => c.ComplaintTypeID)
                    .OnDelete(DeleteBehavior.Restrict);
-            // تعيين العلاقة مع ComplaintType
+            //// تعيين العلاقة مع ComplaintType
             builder.HasMany(ct => ct.Workflows)
-                 .WithOne(w => w.ComplaintType)
-                 .HasForeignKey(c => c.ComplaintTypeID)
-                 .OnDelete(DeleteBehavior.Restrict);
+                    .WithOne(w => w.ComplaintType)
+                    .HasForeignKey(w => w.ComplaintTypeID) // لازم تتفعل
+                    .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }

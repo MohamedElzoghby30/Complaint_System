@@ -17,7 +17,7 @@ namespace ComplaintSystem.Repo.Repository
 
         public async Task<Complaint> AddAsync(Complaint complaint)
         {
-            _context.Complaints.Add(complaint);
+          await  _context.Complaints.AddAsync(complaint);
             await _context.SaveChangesAsync();
             return complaint;
         }

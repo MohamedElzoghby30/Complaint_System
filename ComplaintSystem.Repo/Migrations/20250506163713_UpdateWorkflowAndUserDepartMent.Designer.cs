@@ -4,6 +4,7 @@ using ComplaintSystem.Repo.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ComplaintSystem.Repo.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250506163713_UpdateWorkflowAndUserDepartMent")]
+    partial class UpdateWorkflowAndUserDepartMent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -116,9 +119,6 @@ namespace ComplaintSystem.Repo.Migrations
                     b.Property<int>("ComplaintID")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("CreatAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -149,9 +149,6 @@ namespace ComplaintSystem.Repo.Migrations
 
                     b.Property<int>("ComplaintID")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("CreatAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -184,9 +181,6 @@ namespace ComplaintSystem.Repo.Migrations
 
                     b.Property<int>("ComplaintTypeID")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("CreatAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<int?>("CurrentStepID")
                         .HasColumnType("int");
@@ -231,9 +225,6 @@ namespace ComplaintSystem.Repo.Migrations
                     b.Property<int>("ComplaintID")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("CreatAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("UserID")
                         .HasColumnType("int");
 
@@ -259,9 +250,6 @@ namespace ComplaintSystem.Repo.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("CreatAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("DepartmentID")
                         .HasColumnType("int");
 
@@ -285,9 +273,6 @@ namespace ComplaintSystem.Repo.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("CreatAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("DepartmentName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -308,9 +293,6 @@ namespace ComplaintSystem.Repo.Migrations
 
                     b.Property<int>("ComplaintId")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("CreatAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -368,9 +350,6 @@ namespace ComplaintSystem.Repo.Migrations
 
                     b.Property<int>("ComplaintTypeID")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("CreatAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<int?>("NextStepID")
                         .HasColumnType("int");
