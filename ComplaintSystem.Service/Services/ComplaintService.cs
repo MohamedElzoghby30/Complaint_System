@@ -13,11 +13,13 @@ namespace ComplaintSystem.Service.Services
     public class ComplaintService : IComplaintService
     {
         private readonly IComplaintRepository _complaintRepository;
+        private readonly IComplaintTypeRepository _complaintTypeRepository;
       //  private readonly IMapper _mapper;
 
-        public ComplaintService(IComplaintRepository complaintRepository)
+        public ComplaintService(IComplaintRepository complaintRepository, IComplaintTypeRepository complaintTypeRepository)
         {
             _complaintRepository = complaintRepository;
+            _complaintTypeRepository = complaintTypeRepository;
           //  _mapper = mapper;
         }
 
@@ -29,23 +31,32 @@ namespace ComplaintSystem.Service.Services
             if (!await _complaintRepository.ComplaintTypeExistsAsync(complaintDto.ComplaintTypeID))
                 return (false, new[] { "Invalid ComplaintTypeID." });
 
+            var ComplaintTypeDB = await _complaintTypeRepository.GetComplaintTypeByIdAsync(complaintDto.ComplaintTypeID);
+            
+
+            var firstWorkflow = ComplaintTypeDB.Workflows.First();
+            if (firstWorkflow == null)
+                return (false, new[] { "No workflow defined for this complaint type." });
+
+           
             // var complaint = _mapper.Map<Complaint>(complaintDto);
             var complaint = new Complaint()
             {
                 Description = complaintDto.Description,
                 ComplaintTypeID=complaintDto.ComplaintTypeID,
                 UserID = userId,
-                Status = ComplaintStatus.Pending
+                Status = ComplaintStatus.Pending,
+                CreatAt = DateTime.Now,
+                AssignedAt = DateTime.Now,
+               AssignedToID = ComplaintTypeDB.Workflows.First().UserId
+
             };
+            complaint.CurrentStepID = firstWorkflow.Id;
             //complaint.UserID = userId;
             //complaint.Status = "Pending";
 
             // جيب أول Workflow للـ ComplaintType
-            var firstWorkflow = await _complaintRepository.GetFirstWorkflowAsync(complaintDto.ComplaintTypeID);
-            if (firstWorkflow == null)
-                return (false, new[] { "No workflow defined for this complaint type." });
 
-            complaint.CurrentStepID = firstWorkflow.Id;
 
             await _complaintRepository.AddAsync(complaint);
             return (true, Array.Empty<string>());
@@ -103,6 +114,13 @@ namespace ComplaintSystem.Service.Services
                       Email = complaintDB.User?.Email
                   }
             };
+        }
+
+        public async Task<Complaint> GetComplaintByIdAsync(int Id)
+        {
+            var X = await _complaintRepository.GetComplaintByIdAsync(Id);
+
+            return X;
         }
     }
 }

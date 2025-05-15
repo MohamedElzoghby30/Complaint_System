@@ -33,8 +33,9 @@ namespace ComplaintSystem.Api.Extension
             services.AddScoped<IWorkflowRepo, WorkflowRepo>();
             services.AddScoped<IRatingService, RatingService>();
             services.AddScoped<IRatingRepository, RatingRepository>();
-            services.AddScoped<ICommentRepository, CommentRepository>();
             services.AddScoped<ICommentService, CommentService>();
+            services.AddScoped<ICommentRepository, CommentRepository>();
+           
 
 
 

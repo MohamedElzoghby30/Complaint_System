@@ -13,11 +13,13 @@ namespace ComplaintSystem.Repo.Data.Configrations
     {
         public void Configure(EntityTypeBuilder<CommentComplainer> builder)
         {
+
+            builder.ToTable("Comments");
             builder.Property(com => com.CommentText)
                    .IsRequired();
 
 
-            builder.Property(com => com.CreatedAt)
+            builder.Property(com => com.CreatAt)
                .IsRequired();
 
             builder.HasOne(com => com.Complaint)

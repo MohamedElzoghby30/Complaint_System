@@ -1,6 +1,7 @@
 ﻿using ComplaintSystem.Core.Entities;
 using ComplaintSystem.Core.Repository.Contract;
 using ComplaintSystem.Repo.Data;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,11 +17,16 @@ namespace ComplaintSystem.Repo.Repository
         {
             _context=context;
         }
-        public async Task<bool> AddCommentAsync(Comment comment)
+        public async Task<bool> AddCommentAsync(CommentComplainer comment)
         {
-            await  _context.Comments.AddAsync(comment);
+            //await  _context.Comments.AddAsync(comment);
 
-          return await _context.SaveChangesAsync()>0;
+            ////await _context.SaveChangesAsync();
+            //_context.SaveChanges();
+            await _context.CommentComplainers.AddAsync(comment);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }

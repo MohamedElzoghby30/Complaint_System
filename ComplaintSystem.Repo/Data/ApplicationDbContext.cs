@@ -25,8 +25,8 @@ namespace ComplaintSystem.Repo.Data
 
         public DbSet<Complaint> Complaints { get; set; }
       
-        public DbSet<Comment> Comments { get; set; }
-        public DbSet<ComplaintParticipant> ComplaintParticipants { get; set; }
+       // public DbSet<Comment> Comments { get; set; }
+      //  public DbSet<ComplaintParticipant> ComplaintParticipants { get; set; }
         public DbSet<ComplaintType> ComplaintTypes { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Workflow> Workflows { get; set; }

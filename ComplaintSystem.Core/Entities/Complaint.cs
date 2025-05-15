@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ComplaintSystem.Core.Entities
 {
@@ -17,7 +11,7 @@ namespace ComplaintSystem.Core.Entities
 
         [Required(ErrorMessage = "Status is required.")]
         //[StringLength(50, ErrorMessage = "Status cannot exceed 50 characters.")]
-        public ComplaintStatus Status { get; set; } = ComplaintStatus.Pending;
+        public ComplaintStatus Status { get; set; }
 
         [Required(ErrorMessage = "Description is required.")]
         [StringLength(2000, MinimumLength = 1, ErrorMessage = "Description must be between 1 and 2000 characters.")]
@@ -40,9 +34,10 @@ namespace ComplaintSystem.Core.Entities
         public DateTime? AssignedAt { get; set; }
         public Rating? Rating { get; set; }
         public ICollection<CommentComplainer>? CommentsComplainer { get; set; }
+        public ICollection<Workflow>? Workflows { get; set; }
 
-        public ICollection<ComplaintParticipant> Participants { get; set; } = new List<ComplaintParticipant>();
-        public ICollection<Comment>? Comments { get; set; } = new List<Comment>();
+       // public ICollection<ComplaintParticipant>? Participants { get; set; } = new List<ComplaintParticipant>();
+       // public ICollection<Comment>? Comments { get; set; } = new List<Comment>();
 
         
      

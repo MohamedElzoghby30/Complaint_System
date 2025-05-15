@@ -13,19 +13,31 @@ namespace ComplaintSystem.Api.Controllers
     public class CommentController : ControllerBase
     {
         private readonly ICommentService _commentService;
+        private readonly IComplaintService _complaintService;
 
-        public CommentController(ICommentService commentService)
+        public CommentController(ICommentService commentService, IComplaintService complaintService)
         {
              _commentService = commentService;
+            _complaintService = complaintService;
         }
 
         [HttpPost("Add")]
         public async Task<IActionResult> AddComment([FromBody] AddCommentDTO dto)
         {
-            var paticipantId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-            var result = await _commentService.AddCommentAsync(dto, paticipantId);
+            var UserIDClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
 
-            return result ? Ok("Comment added."): BadRequest("Failed to add comment.");
+            var UserID = int.Parse(UserIDClaim.Value);
+            var complaintDB = await _complaintService.GetComplaintByIdAsync(dto.ComplaintID);
+            if (complaintDB.AssignedToID != UserID&&complaintDB.UserID != UserID)
+                return Unauthorized("Cant not Comment.");    
+
+            var result = await _commentService.AddCommentAsync(dto, UserID);
+            if (!result)
+                return BadRequest("Failed to add comment.");
+
+
+
+            return Ok("Comment added.");
 
 
         }

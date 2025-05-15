@@ -18,17 +18,18 @@ namespace ComplaintSystem.Service.Services
             _commentRepository = commentRepository;
         }
 
-        public async Task<bool> AddCommentAsync(AddCommentDTO dto, int ParticipantId)
+        public async Task<bool> AddCommentAsync(AddCommentDTO dto, int UserID)
         {
-            var comment = new Comment
+            var comment = new CommentComplainer
             {
                 ComplaintID = dto.ComplaintID,
                 CommentText = dto.CommentText,
-                ParticipantID = ParticipantId,
+                UserId = UserID,
                 CreatAt = DateTime.Now
             };
-             
-            return await _commentRepository.AddCommentAsync(comment);
+            var y=  await _commentRepository.AddCommentAsync(comment);
+
+            return y;
         }
     }
 }

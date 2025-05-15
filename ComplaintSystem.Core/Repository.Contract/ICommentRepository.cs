@@ -9,6 +9,6 @@ namespace ComplaintSystem.Core.Repository.Contract
 {
     public interface ICommentRepository
     {
-        Task<bool> AddCommentAsync(Comment comment);
+        Task<bool> AddCommentAsync(CommentComplainer comment);
     }
 }

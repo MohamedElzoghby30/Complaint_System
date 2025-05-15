@@ -59,17 +59,17 @@ namespace ComplaintSystem.Repo.Data.Configrations
                    .OnDelete(DeleteBehavior.Restrict);
 
             // تعيين العلاقة مع Comments
-            builder.HasMany(c => c.Comments)
-                   .WithOne(cm => cm.Complaint)
-                   .HasForeignKey(cm => cm.ComplaintID)
-                   .OnDelete(DeleteBehavior.Cascade);
+            //builder.HasMany(c => c.Comments)
+            //       .WithOne(cm => cm.Complaint)
+            //       .HasForeignKey(cm => cm.ComplaintID)
+            //       .OnDelete(DeleteBehavior.Cascade);
 
 
             // تعيين العلاقة مع ComplaintParticipants
-            builder.HasMany(c => c.Participants)
-                   .WithOne(cp => cp.Complaint)
-                   .HasForeignKey(cp => cp.ComplaintID)
-                   .OnDelete(DeleteBehavior.Cascade);
+            //builder.HasMany(c => c.Participants)
+            //       .WithOne(cp => cp.Complaint)
+            //       .HasForeignKey(cp => cp.ComplaintID)
+            //       .OnDelete(DeleteBehavior.Cascade);
 
 
 

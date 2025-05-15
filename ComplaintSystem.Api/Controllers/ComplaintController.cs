@@ -49,7 +49,7 @@ namespace ComplaintSystem.Api.Controllers
                 return Unauthorized();
 
             int userId = int.Parse(userIdClaim.Value);
-            if (status == null/*||status.ToUpper() != "Pending".ToUpper()|| status.ToUpper() != "InProgress".ToUpper() || status.ToUpper() != "Resolved".ToUpper()*/)
+            if (status == null)
             {
                 var complaints = await _complaintService.GetComplaintsForUserAsync(userId);
                 var list = complaints.ToList();
@@ -60,13 +60,6 @@ namespace ComplaintSystem.Api.Controllers
             else
             {
                 var complaints = await _complaintService.GetComplaintsForUserAsync(userId,status);
-               
-       
-
-               
-
-
-
                 return Ok(complaints);
             }
 
