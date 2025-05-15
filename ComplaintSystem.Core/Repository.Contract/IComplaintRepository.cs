@@ -14,9 +14,13 @@ namespace ComplaintSystem.Core.Repository.Contract
         Task<bool> ComplaintTypeExistsAsync(int complaintTypeId);
         Task<Workflow> GetFirstWorkflowAsync(int complaintTypeId);
         Task<IEnumerable<Complaint>> GetByUserIdAsync(int userId);
+<<<<<<< HEAD
 
         Task<PaginatedListCore<Complaint>> GetByUserIdAsync(int userId, int pageNumber, int pageSize);
         Task<IEnumerable<Complaint>> GetByUserIdAsync(int userId,string status);
+=======
+        Task<IEnumerable<Complaint>> GetByUserIdAsync(int userId,ComplaintStatus status);
+>>>>>>> 4b82f19787e90c6ad999eefd760b9df3aaaf9c8e
         Task<Complaint> GetComplaintByIdAsync(int id, int userId);
 
 
