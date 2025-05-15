@@ -1,4 +1,5 @@
-﻿using ComplaintSystem.Core.DTOs;
+﻿using ComplaintSystem.Core;
+using ComplaintSystem.Core.DTOs;
 using ComplaintSystem.Core.Entities;
 using ComplaintSystem.Core.Repository.Contract;
 using ComplaintSystem.Repo.Data;
@@ -35,11 +36,30 @@ namespace ComplaintSystem.Repo.Repository
         }
         public async Task<IEnumerable<Complaint>> GetByUserIdAsync(int userId)
         {
+            // var totalCount = await _context.Complaints.CountAsync(c => c.UserID == userId);
             return await _context.Complaints
                 .Include(c => c.ComplaintType)
-                .Include(c=>c.User)
+                .Include(c => c.User)
                 .Where(c => c.UserID == userId)
                 .ToListAsync();
+        }
+        public async Task<PaginatedListCore<Complaint>>GetByUserIdAsync(int userId, int pageNumber, int pageSize)
+        {
+
+            //var Count = await _context.Complaints.CountAsync(c => c.UserID == userId);
+            //int TotalPages = (int)Math.Ceiling(Count / (double)pageSize);
+            //bool HasPreviousPage = pageNumber > 1;
+            //bool HasNextPage = pageNumber < TotalPages;
+           var complaints= await _context.Complaints
+               .Include(c => c.ComplaintType)
+               .Include(c => c.User)
+               .Where(c => c.UserID == userId)
+               .Skip((pageNumber - 1) * pageSize)
+               .Take(pageSize)
+               .ToListAsync();
+            var x = await PaginatedListCore<Complaint>.CreateAsync(complaints, pageNumber, pageSize);
+
+            return  x;
         }
         public async Task<IEnumerable<Complaint>> GetByUserIdAsync(int userId,string status)
         {

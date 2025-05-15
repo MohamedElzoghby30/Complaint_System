@@ -9,6 +9,11 @@ using ComplaintSystem.Core.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using ComplaintSystem.Service.Services;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace ComplaintSystem.API.Controllers
 {
@@ -33,6 +38,7 @@ namespace ComplaintSystem.API.Controllers
             _tokenService = tokenService;
             _roleService = roleService;
         }
+      
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegestrationDTO model)

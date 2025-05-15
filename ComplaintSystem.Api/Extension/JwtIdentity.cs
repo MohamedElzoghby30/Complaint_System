@@ -27,6 +27,13 @@ namespace ComplaintSystem.Api.Extension
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+            })
+            .AddGoogle(options =>
+            {
+                var googleAuth = configuration.GetSection("Authentication:Google");
+                options.ClientId = googleAuth["ClientId"];
+                options.ClientSecret = googleAuth["ClientSecret"];
             }).AddJwtBearer(o =>
             {
                 o.RequireHttpsMetadata = false;
