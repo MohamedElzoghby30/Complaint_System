@@ -42,7 +42,7 @@ namespace ComplaintSystem.Api.Controllers
         }
         [HttpGet("MyComplaints")]
         [Authorize(Roles = "Complainer")]
-        public async Task<ActionResult<IEnumerable<ComplaintDTO>>> GetMyComplaints([FromQuery] string? status)
+        public async Task<ActionResult<IEnumerable<ComplaintDTO>>> GetMyComplaints([FromQuery] ComplaintStatus status)
         {
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
             if (userIdClaim == null)

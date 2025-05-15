@@ -41,13 +41,13 @@ namespace ComplaintSystem.Repo.Repository
                 .Where(c => c.UserID == userId)
                 .ToListAsync();
         }
-        public async Task<IEnumerable<Complaint>> GetByUserIdAsync(int userId,string status)
+        public async Task<IEnumerable<Complaint>> GetByUserIdAsync(int userId,ComplaintStatus status)
         {
             return await _context.Complaints
                 .Include(c => c.ComplaintType)
                 .Include(c => c.User)
                 .Where(c => c.UserID == userId)
-                .Where (c => c.Status.ToUpper()==status.ToUpper())
+                .Where (c => c.Status==status)
                 .ToListAsync();
         }
         public async Task<Complaint> GetComplaintByIdAsync(int id, int userId)

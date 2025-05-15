@@ -35,7 +35,7 @@ namespace ComplaintSystem.Service.Services
                 Description = complaintDto.Description,
                 ComplaintTypeID=complaintDto.ComplaintTypeID,
                 UserID = userId,
-                Status = "Pending"
+                Status = ComplaintStatus.Pending
             };
             //complaint.UserID = userId;
             //complaint.Status = "Pending";
@@ -68,7 +68,7 @@ namespace ComplaintSystem.Service.Services
                 }
             });
         }
-        public async Task<IEnumerable<ComplaintDTO>> GetComplaintsForUserAsync(int userId,string status)
+        public async Task<IEnumerable<ComplaintDTO>> GetComplaintsForUserAsync(int userId,ComplaintStatus status)
         {
             var complaints = await _complaintRepository.GetByUserIdAsync(userId, status);
 

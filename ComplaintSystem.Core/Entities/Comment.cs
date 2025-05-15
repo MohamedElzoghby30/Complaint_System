@@ -25,7 +25,7 @@ namespace ComplaintSystem.Core.Entities
         [Required(ErrorMessage = "Comment text is required.")]
         [StringLength(1000, MinimumLength = 1, ErrorMessage = "Comment text must be between 1 and 1000 characters.")]
         public string CommentText { get; set; }
-        [Required(ErrorMessage = "Date created is required.")]
-        public DateTime CreatedAt { get; set; }
+        //[Required(ErrorMessage = "Date created is required.")]
+        //public DateTime CreatedAt { get; set; }
     }
 }
