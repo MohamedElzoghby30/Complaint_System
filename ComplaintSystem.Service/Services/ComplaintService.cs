@@ -1,12 +1,8 @@
-﻿using ComplaintSystem.Core.DTOs;
+﻿using ComplaintSystem.Core;
+using ComplaintSystem.Core.DTOs;
 using ComplaintSystem.Core.Entities;
 using ComplaintSystem.Core.Repository.Contract;
 using ComplaintSystem.Core.Serveice.Contract;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ComplaintSystem.Service.Services
 {
@@ -61,42 +57,45 @@ namespace ComplaintSystem.Service.Services
             await _complaintRepository.AddAsync(complaint);
             return (true, Array.Empty<string>());
         }
-        public async Task<IEnumerable<ComplaintDTO>> GetComplaintsForUserAsync(int userId)
-        {
-            var complaints = await _complaintRepository.GetByUserIdAsync(userId);
+        public async Task<PaginatedListCore<Complaint,ComplaintDTO>> GetComplaintsForUserAsync(int userId, ComplaintStatus status=ComplaintStatus.Pending, int pageNumber=1,int PageSize=10 )
 
-            return complaints.Select(c => new ComplaintDTO
-            {
-                Id = c.Id,
-                Status = c.Status,
-                Description = c.Description,
-                ComplaintTypeName = c.ComplaintType?.TypeName,
-                ComplaintTypeID = c.ComplaintTypeID,
-                User = new UserInfoDTO
-                {
-                    FullName = c.User?.FullName,
-                    Email = c.User?.Email
-                }
-            });
-        }
-        public async Task<IEnumerable<ComplaintDTO>> GetComplaintsForUserAsync(int userId,ComplaintStatus status)
-        {
-            var complaints = await _complaintRepository.GetByUserIdAsync(userId, status);
+        { 
+            if (pageNumber <= 0) pageNumber = 1;
+            if (PageSize <= 0) PageSize = 10;
+           
+            var complaints = await _complaintRepository.GetByUserIdAsync(userId, status,pageNumber, PageSize);
+           
 
-            return complaints.Select(c => new ComplaintDTO
+
+            var count = await _complaintRepository.GetComlaintsNumByUserIdAsync(userId);
+
+            var totalPages = (int)Math.Ceiling(count / (double)PageSize);
+            var hasPreviousPage = pageNumber > 1;
+            var hasNextPage = pageNumber < totalPages;
+
+
+            var paginatedList = new PaginatedListCore<Complaint,ComplaintDTO>
             {
+                TotalPages = totalPages,
+                HasNextPage = hasNextPage,
+                HasPreviousPage = hasPreviousPage,
+                count = count,
+                CurrentPage = pageNumber,
+
+              
+            };
+            paginatedList.items= complaints.Select(c => new ComplaintDTO {
                 Id = c.Id,
-                Status = c.Status,
-                Description = c.Description,
-                ComplaintTypeName = c.ComplaintType?.TypeName,
-                ComplaintTypeID = c.ComplaintTypeID,
-                User = new UserInfoDTO
-                {
-                    FullName = c.User?.FullName,
-                    Email = c.User?.Email
-                }
-            });
+                 Status = c.Status.ToString(),
+                 Description = c.Description,
+                 ComplaintTypeName = c.ComplaintType?.TypeName
+                 }).ToList();
+            return paginatedList;
+
+
         }
+       
+       
         public async Task<ComplaintDTO> GetComplaintAsync(int id, int userId)
         {
             var complaintDB = await _complaintRepository.GetComplaintByIdAsync(id, userId);
@@ -105,22 +104,26 @@ namespace ComplaintSystem.Service.Services
             return new ComplaintDTO
             {
                 Id = complaintDB.Id,
-                Status = complaintDB.Status,
+                Status = complaintDB.Status.ToString(),
                 Description = complaintDB.Description,
                 ComplaintTypeName = complaintDB.ComplaintType?.TypeName,
-                User = new UserInfoDTO
-                  {
-                      FullName = complaintDB.User?.FullName,
-                      Email = complaintDB.User?.Email
-                  }
+                //User = new UserInfoDTO
+                //  {
+                //      FullName = complaintDB.User?.FullName,
+                //      Email = complaintDB.User?.Email
+                //  }
             };
         }
 
-        public async Task<Complaint> GetComplaintByIdAsync(int Id)
+        public async Task<Complaint> GetComplaintByIdAsync(int Id,int UserID)
         {
-            var X = await _complaintRepository.GetComplaintByIdAsync(Id);
+            var complaintDB = await _complaintRepository.GetComplaintByIWithEmployeedAsync(Id, UserID);
 
-            return X;
+            return complaintDB;
+        }
+        public async Task<bool> UpdateComplaintAsync(Complaint complaint)
+        {
+            return await _complaintRepository.UpdateComplaintAsync(complaint);
         }
     }
 }

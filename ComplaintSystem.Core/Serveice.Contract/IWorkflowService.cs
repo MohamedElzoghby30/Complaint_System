@@ -14,5 +14,7 @@ namespace ComplaintSystem.Core.Serveice.Contract
         Task<bool> CreateWorkflowStepAsync(CreateWorkflowStepDTO dto);
         Task<bool> DeleteWorkflowStepAsync(int workflowId);
         Task<bool> UpdateWorkflowUserAsync(int workflowId, string userEmail);
+        Task<GetWorkflow> GetWorkflowsByIdAsync(int workflowId);
+        Task<Workflow> WorkflowsByIdAsync(int workflowId);
     }
 }

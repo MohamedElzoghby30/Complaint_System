@@ -11,10 +11,12 @@ namespace ComplaintSystem.Core.Serveice.Contract
     public interface IComplaintService
     {
         Task<(bool Succeeded, string[] Errors)> CreateComplaintAsync(AddComplaintDTO complaintDto, int userId);
-        Task<IEnumerable<ComplaintDTO>> GetComplaintsForUserAsync(int userId);
-        Task<Complaint> GetComplaintByIdAsync(int Id);
-      
-        Task<IEnumerable<ComplaintDTO>> GetComplaintsForUserAsync(int userId,ComplaintStatus status);
+        Task<PaginatedListCore<Complaint,ComplaintDTO>> GetComplaintsForUserAsync(int userId, ComplaintStatus status, int pageNumber, int PageSize);
+        Task<Complaint> GetComplaintByIdAsync(int Id,int UserID);
+
+
         Task<ComplaintDTO> GetComplaintAsync(int id, int userId);
+        Task<bool> UpdateComplaintAsync(Complaint complaint);
+       // Task<Complaint> GetComplaintByIdAsync(int Id, int UserID);
     }
 }

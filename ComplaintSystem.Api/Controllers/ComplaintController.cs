@@ -2,11 +2,8 @@
 using ComplaintSystem.Core.DTOs;
 using ComplaintSystem.Core.Entities;
 using ComplaintSystem.Core.Serveice.Contract;
-using ComplaintSystem.Service.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Security.Claims;
 
 namespace ComplaintSystem.Api.Controllers
@@ -18,11 +15,17 @@ namespace ComplaintSystem.Api.Controllers
         private readonly IComplaintService _complaintService;
         private readonly IComplaintTypeService _complaintTypeService;
         private readonly IRatingService _ratingService;
-        public ComplaintController(IComplaintService complaintService, IComplaintTypeService complaintTypeService, IRatingService ratingService)
+        private readonly IUserService _userservice;
+        private readonly IWorkflowService _workflowService;
+        private readonly ICommentService _commentService;
+        public ComplaintController(IComplaintService complaintService, IComplaintTypeService complaintTypeService, IRatingService ratingService, IUserService userservice, IWorkflowService workflowService, ICommentService commentService)
         {
             _complaintService = complaintService;
             _complaintTypeService = complaintTypeService;
             _ratingService = ratingService;
+            _userservice = userservice;
+            _workflowService = workflowService;
+            _commentService = commentService;
         }
 
         [Authorize(Roles = "Complainer")]
@@ -42,34 +45,26 @@ namespace ComplaintSystem.Api.Controllers
         }
         [HttpGet("MyComplaints")]
         [Authorize(Roles = "Complainer")]
-        public async Task<ActionResult<IEnumerable<ComplaintDTO>>> GetMyComplaints([FromQuery] ComplaintStatus status)
+        public async Task<ActionResult<IEnumerable<ComplaintDTO>>> GetMyComplaints([FromQuery] ComplaintStatus status,int? PageNumber,int? PageSize )
         {
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
             if (userIdClaim == null)
                 return Unauthorized();
 
             int userId = int.Parse(userIdClaim.Value);
-            if (status == null)
-            {
-                var complaints = await _complaintService.GetComplaintsForUserAsync(userId);
-                var list = complaints.ToList();
+         
+                var complaints = await _complaintService.GetComplaintsForUserAsync(userId, status, PageNumber??0,PageSize??0);
+                
                // var page = new PaginatedList<ComplaintDTO>(list, list.Count(), 1, list.Count());
-                var x= PaginatedList<ComplaintDTO>.CreateAsync(complaints, 1, 2);
-                return Ok(new {x.Result.Items , x.Result.Count,x.Result.HasPreviousPage,x.Result.HasNextPage});
-            }
-            else
-            {
-                var complaints = await _complaintService.GetComplaintsForUserAsync(userId,status);
+                
                 return Ok(complaints);
-            }
-
            
+
         }
         [HttpGet("GetComplaintByID")]
         [Authorize(Roles = "Complainer")]
         public async Task<IActionResult> GetComplaint(int id)
         {
-          //  var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
             if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId) || userId == 0) 
                 return Unauthorized();
@@ -105,6 +100,44 @@ namespace ComplaintSystem.Api.Controllers
                 return BadRequest("The complaint is not yours or has already been evaluated.");
 
             return Ok("Successfully evaluated");
+        }
+        [HttpPut("Escalate")]
+        [Authorize]
+        public async Task<IActionResult> EscalateComplaintWorkflow([FromQuery] EscalateDTO escalateDTO)
+        {
+            var userIdClaim = int.Parse((User.FindFirst(ClaimTypes.NameIdentifier)).Value);
+            var UserDB= await _userservice.FindByIdAsync(userIdClaim);
+            var complaint = await _complaintService.GetComplaintByIdAsync(escalateDTO.ComplaintID, userIdClaim);
+            if (complaint == null)
+                return NotFound(new { message = "Complaint not found or not yours." });
+            var workflowDB =  await _workflowService.WorkflowsByIdAsync(complaint.CurrentStepID?? 0);
+        
+          var nextStepId = workflowDB.NextStepID;
+            if (nextStepId == null)
+                return NotFound(new { message = "Cant Escalte" });
+           
+            complaint.CurrentStepID = workflowDB.NextStepID;
+            complaint.AssignedToID = workflowDB.NextStep.UserId;
+            complaint.AssignedAt = DateTime.Now;
+            var result = await _complaintService.UpdateComplaintAsync(complaint);
+            if (!result)
+                return BadRequest("Failed to escalate complaint.");
+            if(escalateDTO.Comment== null || escalateDTO.Comment == string.Empty)
+            { 
+                return Ok("Complaint escalated successfully.");
+            }
+            var Comment =new AddCommentDTO
+            {
+                ComplaintID = complaint.Id,
+               
+                CommentText = escalateDTO.Comment,
+            };
+            var CommentRes = await _commentService.AddCommentAsync(Comment,UserDB.Id);
+             if (!CommentRes)
+                return BadRequest("Failed to add comment.");
+
+            return Ok("Complaint escalated successfully.");
+
         }
     }
 }

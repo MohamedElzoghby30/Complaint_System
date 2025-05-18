@@ -90,6 +90,29 @@ namespace ComplaintSystem.Service.Services
             var reslut = await _repo.UpdateWorkflowUserAsync(user.Id, workflow.Id);
             return reslut;
         }
+        public async Task<GetWorkflow> GetWorkflowsByIdAsync(int workflowId)
+        {
+            var workflowDB = await _repo.GetWorkflowByIdAsync(workflowId);
+            if (workflowDB == null)
+                return null;
+           return new GetWorkflow
+           {
+                StepName = workflowDB.StepName,
+                ComplaintTypeID = workflowDB.ComplaintTypeID,
+                StepOrder = workflowDB.StepOrder,
+                NextStepID = workflowDB.NextStepID,
+                UserId = workflowDB.UserId
+                
+        };
+           }
+        public async Task<Workflow> WorkflowsByIdAsync(int workflowId)
+        {
+            var workflowDB = await _repo.GetWorkflowByIdAsync(workflowId);
+            if (workflowDB == null)
+                return null;
+            return workflowDB;
+        }
 
     }
-}
+ }
+

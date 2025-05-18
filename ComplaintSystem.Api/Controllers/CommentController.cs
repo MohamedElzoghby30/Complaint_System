@@ -27,9 +27,9 @@ namespace ComplaintSystem.Api.Controllers
             var UserIDClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
 
             var UserID = int.Parse(UserIDClaim.Value);
-            var complaintDB = await _complaintService.GetComplaintByIdAsync(dto.ComplaintID);
+            var complaintDB = await _complaintService.GetComplaintByIdAsync(dto.ComplaintID, UserID);
             if (complaintDB.AssignedToID != UserID&&complaintDB.UserID != UserID)
-                return Unauthorized("Cant not Comment.");    
+                return Unauthorized("Can not Comment.");    
 
             var result = await _commentService.AddCommentAsync(dto, UserID);
             if (!result)

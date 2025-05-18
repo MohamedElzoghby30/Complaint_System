@@ -14,14 +14,16 @@ namespace ComplaintSystem.Core.Repository.Contract
         Task<bool> ComplaintTypeExistsAsync(int complaintTypeId);
         Task<Workflow> GetFirstWorkflowAsync(int complaintTypeId);
         Task<IEnumerable<Complaint>> GetByUserIdAsync(int userId);
-        Task<Complaint> GetComplaintByIdAsync(int id);
+        Task<int> GetComlaintsNumByUserIdAsync(int id);
+        Task<Complaint> GetComplaintByIWithEmployeedAsync(int id,int userId);
 
-        Task<PaginatedListCore<Complaint>> GetByUserIdAsync(int userId, int pageNumber, int pageSize);
+        Task<IEnumerable<Complaint>> GetByUserIdAsync(int userId,ComplaintStatus status, int pageNumber, int pageSize);
        
 
         Task<IEnumerable<Complaint>> GetByUserIdAsync(int userId,ComplaintStatus status);
 
         Task<Complaint> GetComplaintByIdAsync(int id, int userId);
+        Task<bool> UpdateComplaintAsync(Complaint complaint);
 
 
     }

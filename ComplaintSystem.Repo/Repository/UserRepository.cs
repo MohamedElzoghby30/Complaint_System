@@ -27,6 +27,11 @@ namespace ComplaintSystem.Repository.Repository
         public Task<bool> RoleExistsAsync(string role) => _roleManager.RoleExistsAsync(role);
         public Task<IdentityResult> AddToRoleAsync(ApplicationUser user, string role) => _userManager.AddToRoleAsync(user, role);
         public Task<IList<string>> GetRolesAsync(ApplicationUser user) => _userManager.GetRolesAsync(user);
+
+        public Task<ApplicationUser> FindByIdAsync(int UserId)=> _userManager.Users
+            .Include(x => x.AssignedComplaints)
+            .FirstOrDefaultAsync(x => x.Id == UserId);
+       
     }
 
 }

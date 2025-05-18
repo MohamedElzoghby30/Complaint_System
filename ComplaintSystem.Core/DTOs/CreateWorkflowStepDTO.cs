@@ -1,6 +1,8 @@
-﻿using System;
+﻿using ComplaintSystem.Core.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,6 +36,16 @@ namespace ComplaintSystem.Core.DTOs
         [EmailAddress]
         public string? UserEmail { get; set; }
     }
+    public class GetWorkflow
+    {
+        public string StepName { get; set; }
+        public int ComplaintTypeID { get; set; }
 
+        public int? StepOrder { get; set; }
+        public int? NextStepID { get; set; }
+        public int? UserId { get; set; }
+
+
+    }
 }
 

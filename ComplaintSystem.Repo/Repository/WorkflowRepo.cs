@@ -72,7 +72,7 @@ namespace ComplaintSystem.Repo.Repository
         }
        
         public async Task<Workflow> GetWorkflowByIdAsync(int WorkfloId) 
-            => await _context.Workflows.FindAsync(WorkfloId);
+            => await _context.Workflows.Include(x=>x.NextStep).FirstAsync(x=>x.Id==WorkfloId);
 
         public  async Task<bool> UpdateWorkflowUserAsync(int UserId,int worflowId)
         {
