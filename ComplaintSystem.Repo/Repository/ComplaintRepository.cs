@@ -42,7 +42,19 @@ namespace ComplaintSystem.Repo.Repository
                 .Where(c => c.UserID == userId)
                 .ToListAsync();
         }
-        public async Task<IEnumerable<Complaint>>GetByUserIdAsync(int userId, ComplaintStatus status,int pageNumber=0, int pageSize=0)
+        public async Task<IEnumerable<Complaint>> Assin(int userId, ComplaintStatus status, int pageNumber = 0, int pageSize = 0)
+        {
+
+
+            var complaints = await _context.Complaints
+                .Include(c => c.ComplaintType)
+                .Include(c => c.User)
+                .Where(c => c.AssignedToID == userId && c.Status == status)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize).ToListAsync();
+            return complaints;
+        }
+            public async Task<IEnumerable<Complaint>>GetByUserIdAsync(int userId, ComplaintStatus status,int pageNumber=0, int pageSize=0)
         {
            
 

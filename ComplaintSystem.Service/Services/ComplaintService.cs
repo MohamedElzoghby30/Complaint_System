@@ -94,8 +94,46 @@ namespace ComplaintSystem.Service.Services
 
 
         }
-       
-       
+        public async Task<PaginatedListCore<Complaint, ComplaintDTO>> AssinComplaint(int userId, ComplaintStatus status = ComplaintStatus.Pending, int pageNumber = 1, int PageSize = 10)
+
+        {
+            if (pageNumber <= 0) pageNumber = 1;
+            if (PageSize <= 0) PageSize = 10;
+
+            var complaints = await _complaintRepository.Assin(userId, status, pageNumber, PageSize);
+
+
+
+            var count = await _complaintRepository.GetComlaintsNumByUserIdAsync(userId);
+
+            var totalPages = (int)Math.Ceiling(count / (double)PageSize);
+            var hasPreviousPage = pageNumber > 1;
+            var hasNextPage = pageNumber < totalPages;
+
+
+            var paginatedList = new PaginatedListCore<Complaint, ComplaintDTO>
+            {
+                TotalPages = totalPages,
+                HasNextPage = hasNextPage,
+                HasPreviousPage = hasPreviousPage,
+                count = count,
+                CurrentPage = pageNumber,
+
+
+            };
+            paginatedList.items = complaints.Select(c => new ComplaintDTO
+            {
+                Id = c.Id,
+                Status = c.Status.ToString(),
+                Description = c.Description,
+                ComplaintTypeName = c.ComplaintType?.TypeName
+            }).ToList();
+            return paginatedList;
+
+
+        }
+
+
         public async Task<ComplaintDTO> GetComplaintAsync(int id, int userId)
         {
             var complaintDB = await _complaintRepository.GetComplaintByIdAsync(id, userId);

@@ -61,6 +61,24 @@ namespace ComplaintSystem.Api.Controllers
            
 
         }
+        [HttpGet("AssingedComplaints")]
+        [Authorize(Roles = "Complainer")]
+        public async Task<ActionResult<IEnumerable<ComplaintDTO>>> AssingedComplaints([FromQuery] ComplaintStatus status, int? PageNumber, int? PageSize)
+        {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return Unauthorized();
+
+            int userId = int.Parse(userIdClaim.Value);
+
+            var complaints = await _complaintService.AssinComplaint(userId, status, PageNumber ?? 0, PageSize ?? 0);
+
+            // var page = new PaginatedList<ComplaintDTO>(list, list.Count(), 1, list.Count());
+
+            return Ok(complaints);
+
+
+        }
         [HttpGet("GetComplaintByID")]
         [Authorize(Roles = "Complainer")]
         public async Task<IActionResult> GetComplaint(int id)

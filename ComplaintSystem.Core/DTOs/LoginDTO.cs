@@ -10,6 +10,9 @@ namespace ComplaintSystem.Core.DTOs
 
         [Required(ErrorMessage = "Password is required.")]
         public string Password { get; set; }
+        
+
+        public string Role { get; set; }
 
     }
 }

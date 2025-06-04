@@ -26,7 +26,8 @@ namespace ComplaintSystem.Repository.Repository
         public Task<IdentityResult> CreateAsync(ApplicationUser user, string password) => _userManager.CreateAsync(user, password);
         public Task<bool> RoleExistsAsync(string role) => _roleManager.RoleExistsAsync(role);
         public Task<IdentityResult> AddToRoleAsync(ApplicationUser user, string role) => _userManager.AddToRoleAsync(user, role);
-        public Task<IList<string>> GetRolesAsync(ApplicationUser user) => _userManager.GetRolesAsync(user);
+        public Task<IList<string>> GetRolesAsync(ApplicationUser user) =>  _userManager.GetRolesAsync(user);
+     //  public Task<IList<string>> GetUsersAsync(string role) => _context.Users.Where(x=>x.);
 
         public Task<ApplicationUser> FindByIdAsync(int UserId)=> _userManager.Users
             .Include(x => x.AssignedComplaints)

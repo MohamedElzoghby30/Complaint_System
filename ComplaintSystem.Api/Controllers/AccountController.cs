@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using ComplaintSystem.Api;
 
 namespace ComplaintSystem.API.Controllers
 {
@@ -70,12 +71,74 @@ namespace ComplaintSystem.API.Controllers
 
             if (!result.Succeeded)
                 return Unauthorized("The Passworrd is Not Valid");
+            
+
              var roles = await _userManager.GetRolesAsync(user);
+            if (!roles.Contains(model.Role))
+                return Unauthorized("User has no roles assigned.");
+            
             var jwtToken = await _tokenService.CreateToken(user, _userManager);
             var token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
             Console.WriteLine(token);
             return Ok(new { token });
         }
+
+        [HttpGet("GetUsers")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> GetUsers([FromQuery] string? role, [FromQuery] int PageNumber = 1, [FromQuery] int PageSize = 10)
+        {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return Unauthorized();
+
+            List<ApplicationUser> filteredUsers;
+
+            if (string.IsNullOrEmpty(role))
+            {
+                
+                var allUsers = _userManager.Users.ToList();
+                filteredUsers = new List<ApplicationUser>();
+
+                foreach (var user in allUsers)
+                {
+                    var roles = await _userManager.GetRolesAsync(user);
+                    if (roles == null || !roles.Any())
+                        filteredUsers.Add(user);
+                }
+            }
+            else
+            {
+               
+                filteredUsers = (await _userManager.GetUsersInRoleAsync(role)).ToList();
+            }
+
+            var totalCount = filteredUsers.Count;
+
+            var pagedUsers = filteredUsers
+                .Skip((PageNumber - 1) * PageSize)
+                .Take(PageSize)
+                .Select(user => new UserDTO
+                {
+                    Id = user.Id,
+                    FullName = user.FullName,
+                    Email = user.Email,
+                    IsActive = user.LockoutEnd == null || user.LockoutEnd <= DateTimeOffset.Now
+
+
+                })
+                .ToList();
+
+            var result = new PagedResult<UserDTO>
+            {
+                Items = pagedUsers,
+                TotalCount = totalCount,
+                PageNumber = PageNumber,
+                PageSize = PageSize
+            };
+
+            return Ok(result);
+        }
+
 
         [HttpGet("GetAllRoles")]
         [Authorize(Roles = "Admin")]
