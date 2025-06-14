@@ -17,6 +17,7 @@ namespace ComplaintSystem.Core.Serveice.Contract
         Task<PaginatedListCore<Complaint, ComplaintDTO>> AssinComplaint(int userId, ComplaintStatus status = ComplaintStatus.Pending, int pageNumber = 1, int PageSize = 10);
         Task<ComplaintDTO> GetComplaintAsync(int id, int userId);
         Task<bool> UpdateComplaintAsync(Complaint complaint);
-       // Task<Complaint> GetComplaintByIdAsync(int Id, int UserID);
+        // Task<Complaint> GetComplaintByIdAsync(int Id, int UserID);
+        Task<bool> UpdateComplaintStatusAsync(UpdateComplaintStatusDTO dto, int userId);
     }
 }

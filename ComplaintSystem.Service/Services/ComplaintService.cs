@@ -163,5 +163,24 @@ namespace ComplaintSystem.Service.Services
         {
             return await _complaintRepository.UpdateComplaintAsync(complaint);
         }
+
+        public async Task<bool> UpdateComplaintStatusAsync(UpdateComplaintStatusDTO dto, int userId)
+        {
+            var complaint = await _complaintRepository.GetComplaintByIdAsync(dto.ComplaintId, userId);
+
+            if (complaint == null)
+                return false;
+
+            // Only the assigned user can change the status
+            if (complaint.AssignedToID != userId)
+                return false;
+
+            // Prevent changing to Escalated here 
+            //if (dto.Status == ComplaintStatus.Escalated)
+            //    return false;
+
+            complaint.Status = dto.Status;
+            return await _complaintRepository.UpdateComplaintAsync(complaint);
+        }
     }
 }

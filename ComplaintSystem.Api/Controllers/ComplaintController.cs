@@ -137,6 +137,7 @@ namespace ComplaintSystem.Api.Controllers
             complaint.CurrentStepID = workflowDB.NextStepID;
             complaint.AssignedToID = workflowDB.NextStep.UserId;
             complaint.AssignedAt = DateTime.Now;
+            //complaint.Status = ComplaintStatus.Escalated;
             var result = await _complaintService.UpdateComplaintAsync(complaint);
             if (!result)
                 return BadRequest("Failed to escalate complaint.");
@@ -156,6 +157,23 @@ namespace ComplaintSystem.Api.Controllers
 
             return Ok("Complaint escalated successfully.");
 
+        }
+
+        [HttpPut("EditStatus")]
+        [Authorize]
+        public async Task<IActionResult> EditStatus([FromBody] UpdateComplaintStatusDTO dto)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return Unauthorized();
+
+            int userId = int.Parse(userIdClaim.Value);
+
+            var result = await _complaintService.UpdateComplaintStatusAsync(dto, userId);
+            if (!result)
+                return NotFound();
+
+            return Ok("Status updated successfully.");
         }
     }
 }
