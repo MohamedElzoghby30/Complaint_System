@@ -1,7 +1,9 @@
 ﻿using ComplaintSystem.Core.DTOs;
+using ComplaintSystem.Core.Entities;
 using ComplaintSystem.Core.Serveice.Contract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ComplaintSystem.Api.Controllers
@@ -11,9 +13,11 @@ namespace ComplaintSystem.Api.Controllers
     public class DepartmentController : ControllerBase
     {
         private readonly IDepartmentService _departmentService;
-        public DepartmentController(IDepartmentService service)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public DepartmentController(IDepartmentService service,UserManager<ApplicationUser> userManager)
         {
             _departmentService = service;
+            _userManager = userManager;
         }
 
         [HttpGet("Get-All-Department")]
@@ -44,6 +48,30 @@ namespace ComplaintSystem.Api.Controllers
                 return NotFound(new { message = "Department not found" });
 
             return Ok(updated);
+        }
+        [HttpPut("Get-Users-For-Department")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetUsersForDepartment([FromQuery] int DepartmentID)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+           
+
+            var users = _userManager.Users.Where(x=>x.DepartmentID==DepartmentID).ToList() ;
+            if (users == null)
+                return NotFound(new { message = "Department not found" });
+
+            var ActiveUsers = 
+                users.Select(u => new UserDTO
+                {
+                      Id = u.Id,
+                      Email = u.Email,
+                      FullName = u.FullName,
+                      IsActive = u.LockoutEnd == null || u.LockoutEnd <= DateTimeOffset.Now,
+
+                }).ToList();
+
+            return Ok(ActiveUsers);
         }
 
     }

@@ -14,4 +14,24 @@ namespace ComplaintSystem.Core.DTOs
         public string Email { get; set; }
         public bool IsActive { get; set; }
     }
+    public class GetUserDTO
+    {
+
+        public int Id { get; set; }
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Address { get; set; }
+       
+    }
+    public class UpdateUserDTO
+    {
+
+       // public int Id { get; set; }
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Address { get; set; }
+
+    }
 }

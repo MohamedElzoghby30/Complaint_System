@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using ComplaintSystem.Api;
+using Microsoft.EntityFrameworkCore;
 
 namespace ComplaintSystem.API.Controllers
 {
@@ -117,6 +118,48 @@ namespace ComplaintSystem.API.Controllers
                 return BadRequest(result.Errors);
 
             return Ok("Password reset successfully.");
+        }
+
+        [HttpGet("GetProfile")]
+        [Authorize(Roles = "Admin,Complainer,Employee")]
+        public async Task<IActionResult> GetProfile()
+        {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return Unauthorized();
+            var Profile = await _userManager.Users.FirstAsync(x=>x.Id== int.Parse(userIdClaim.Value));
+
+            var user= new GetUserDTO
+            {
+                Id = Profile.Id,
+                FullName = Profile.FullName,
+                Email = Profile.Email,
+                PhoneNumber= Profile.PhoneNumber,
+               // Address= Profile.Address
+            };
+
+            return Ok(user);
+        }
+        [HttpPut("EditProfile")]
+        [Authorize(Roles = "Admin,Complainer,Employee")]
+        public async Task<IActionResult> EditProfile([FromBody] UpdateUserDTO updateUserDTO)
+        {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return Unauthorized();
+            var Profile = await _userManager.Users.FirstAsync(x => x.Id == int.Parse(userIdClaim.Value));
+            if (Profile == null)
+                return NotFound("User not found.");
+
+                Profile.FullName = updateUserDTO.FullName;
+                Profile.Email = updateUserDTO.Email;
+                Profile.PhoneNumber = updateUserDTO.PhoneNumber;
+                //Profile.Address= updateUserDTO.Address
+           var result = await _userManager.UpdateAsync(Profile);
+          
+            if(!result.Succeeded)
+                return BadRequest(result.Errors);
+            return Ok("Profile Updated ");
         }
 
         [HttpGet("GetUsers")]

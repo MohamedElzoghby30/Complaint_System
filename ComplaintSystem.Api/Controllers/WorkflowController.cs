@@ -1,7 +1,9 @@
 ﻿
 using ComplaintSystem.Core.DTOs;
+using ComplaintSystem.Core.Entities;
 using ComplaintSystem.Core.Serveice.Contract;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ComplaintSystem.Api.Controllers
@@ -11,9 +13,11 @@ namespace ComplaintSystem.Api.Controllers
     public class WorkflowController : ControllerBase
     {
         private readonly IWorkflowService _workflowService;
-        public WorkflowController(IWorkflowService workflowService)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public WorkflowController(IWorkflowService workflowService,UserManager<ApplicationUser> userManager)
         {
             _workflowService = workflowService;
+            _userManager = userManager;
         }
 
         [HttpGet("GetByComplaintType/{complaintTypeId}")]
@@ -47,6 +51,46 @@ namespace ComplaintSystem.Api.Controllers
                 return NotFound("Workflow step not found.");
 
             return Ok("Workflow step deleted successfully.");
+        }
+        [HttpPut("Get-Users-For-complaintType")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetUsersForComplaintType([FromQuery] int complaintTypeId)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+
+            var users = await _workflowService.GetWorkflowsByComplaintTypeAsync(complaintTypeId);
+            if (users == null)
+                return NotFound(new { message = "ComplaintType not found" });
+           
+
+            var ActiveUsers =
+                users.Select(u => new UserDTO
+                {
+                   
+                    Id = u.UserId,
+                    Email = u.UserEmail,
+                    FullName = u.UserName,
+                }).ToList();
+
+            return Ok(ActiveUsers);
+        }
+        [HttpPut("SwapUserToUser")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> SwapUserToUser(SwapWorkflowDTO swapWorkflowDTO)
+        {
+            var WorkflowsDB = await _workflowService.GetWorkflowsByComplaintTypeAsync(swapWorkflowDTO.ComplaintTypeId);
+            if (WorkflowsDB == null || !WorkflowsDB.Any())
+                return NotFound("No workflows found for the specified complaint type.");
+            var Workflow1 = WorkflowsDB.FirstOrDefault(x => x.UserEmail == swapWorkflowDTO.Email1);
+            var Workflow2 = WorkflowsDB.FirstOrDefault(x => x.UserEmail == swapWorkflowDTO.Email2);
+            if (Workflow1 == null || Workflow2 == null)
+                return NotFound("One or both users not found in the workflow steps.");
+            var updateUser1= await _workflowService.UpdateWorkflowUserAsync(Workflow1.workflowId,Workflow2.UserEmail);
+            var updateUser2 = await _workflowService.UpdateWorkflowUserAsync(Workflow2.workflowId, Workflow1.UserEmail);
+
+            return Ok("User updated successfully for workflow step.");
         }
 
         [HttpPut("UpdateUser")]

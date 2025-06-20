@@ -26,6 +26,9 @@ namespace ComplaintSystem.Service.Services
             var WorkflowDB = await _repo.GetWorkflowByComplaintTypeAsync(complaintTypeId);
             return WorkflowDB.Select(d => new GetWorkflowStepDTO
             {
+                workflowId= d.Id,
+                UserName=d.User?.FullName ?? "No User Assigned",
+                UserId= d.UserId??0,
                 StepName = d.StepName,
                 UserEmail=d.User.Email
 
@@ -101,7 +104,7 @@ namespace ComplaintSystem.Service.Services
                 ComplaintTypeID = workflowDB.ComplaintTypeID,
                 StepOrder = workflowDB.StepOrder,
                 NextStepID = workflowDB.NextStepID,
-                UserId = workflowDB.UserId
+                UserId = workflowDB.UserId??0
                 
         };
            }

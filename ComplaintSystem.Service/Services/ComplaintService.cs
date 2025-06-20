@@ -55,17 +55,18 @@ namespace ComplaintSystem.Service.Services
             await _complaintRepository.AddAsync(complaint);
             return (true, Array.Empty<string>());
         }
-        public async Task<PaginatedListCore<Complaint,ComplaintDTO>> GetComplaintsForUserAsync(int userId, ComplaintStatus status=ComplaintStatus.Pending, int pageNumber=1,int PageSize=10 )
+        public async Task<PaginatedListCore<Complaint,ComplaintDTO>> GetComplaintsForUserAsync(int userId, ComplaintStatus status=ComplaintStatus.Pending, int pageNumber=0,int PageSize=0)
 
-        { 
-            if (pageNumber <= 0) pageNumber = 1;
-            if (PageSize <= 0) PageSize = 10;
-           
+        {
+            if (pageNumber <= 0) pageNumber = 0;
+            if (PageSize <= 0) PageSize = 0;
+
             var complaints = await _complaintRepository.GetByUserIdAsync(userId, status,pageNumber, PageSize);
            
 
 
             var count = await _complaintRepository.GetComlaintsNumByUserIdAsync(userId);
+          
 
             var totalPages = (int)Math.Ceiling(count / (double)PageSize);
             var hasPreviousPage = pageNumber > 1;
@@ -82,12 +83,21 @@ namespace ComplaintSystem.Service.Services
 
               
             };
-            paginatedList.items= complaints.Select(c => new ComplaintDTO {
+            paginatedList.items= complaints.Select(c => new ComplaintDTO
+            {
                 Id = c.Id,
-                 Status = c.Status.ToString(),
-                 Title = c.Title,
-                 ComplaintTypeName = c.ComplaintType?.TypeName
-                 }).ToList();
+                Status = c.Status.ToString(),
+                Title = c.Title,
+                ComplaintTypeName = c.ComplaintType?.TypeName,
+                //Comments = c.CommentsComplainer.Select(cc => new CommentDTO
+                //{
+                //    Id = cc.Id,
+                //    Text = cc.CommentText,
+                //    CreatedAt = cc.CreatAt,
+                //    UserId = cc.UserId,
+                //    UserEmail = cc.User?.Email
+                //}).ToList()
+            }).ToList();
             return paginatedList;
 
 
@@ -143,11 +153,17 @@ namespace ComplaintSystem.Service.Services
                 Status = complaintDB.Status.ToString(),
                 Description = complaintDB.Description,
                 ComplaintTypeName = complaintDB.ComplaintType?.TypeName,
-                //User = new UserInfoDTO
-                //  {
-                //      FullName = complaintDB.User?.FullName,
-                //      Email = complaintDB.User?.Email
-                //  }
+                Title = complaintDB.Title,
+                Comments= complaintDB.CommentsComplainer.Select(c => new CommentDTO
+                {
+                    Id = c.Id,
+                    Text = c.CommentText,
+                    CreatedAt = c.CreatAt,
+                    UserId = c.UserId,
+                    UserEmail = c.User?.Email 
+                }).ToList(),
+
+               
             };
         }
 

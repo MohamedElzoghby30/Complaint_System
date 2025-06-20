@@ -55,28 +55,29 @@ namespace ComplaintSystem.Repo.Repository
             return complaints;
         }
             public async Task<IEnumerable<Complaint>>GetByUserIdAsync(int userId, ComplaintStatus status,int pageNumber=0, int pageSize=0)
-        {
-           
+            {
+
+               if (pageNumber <= 0|| pageSize<=0) 
+               {
+                var complaintss = await _context.Complaints
+                .Include(c => c.ComplaintType)
+                .Include(c => c.User)
+                .Include(c=> c.CommentsComplainer)
+                .Where(c => c.UserID == userId && c.Status == status)
+                .ToListAsync();
+                return complaintss;
+               }
 
             var complaints = await _context.Complaints
                 .Include(c => c.ComplaintType)
                 .Include(c => c.User)
+                .Include(c => c.CommentsComplainer)
                 .Where(c => c.UserID == userId&&c.Status==status)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize).ToListAsync();
             return complaints;
-
-            //return new PaginatedListCore<Complaint>()
-            //{
-            //    count= count,
-            //    TotalPages= totalPages,
-            //    HasNextPage= hasNextPage,
-            //    HasPreviousPage= hasPreviousPage,
-            //    items= complaints,
-            //   CurrentPage = pageNumber
-
-            //};
-        }
+           
+            }
         public async Task<IEnumerable<Complaint>> GetByUserIdAsync(int userId,ComplaintStatus status)
         {
             return await _context.Complaints
@@ -95,7 +96,7 @@ namespace ComplaintSystem.Repo.Repository
                 .FirstOrDefaultAsync(x => x.Id == id && x.UserID == userId);
         }
         public async Task<Complaint> GetComplaintByIWithEmployeedAsync(int id,int UserId)
-        => await _context.Complaints.Include(x=>x.Workflows).FirstAsync(x=>x.Id==id && x.AssignedToID==UserId );
+        => await _context.Complaints.Include(x=>x.Workflows).FirstAsync(x=>x.Id==id);
        
         public async Task<bool> UpdateComplaintAsync(Complaint complaint)
         {
