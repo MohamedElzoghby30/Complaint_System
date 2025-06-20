@@ -44,15 +44,13 @@ namespace ComplaintSystem.Service.Services
                 Status = ComplaintStatus.Pending,
                 CreatAt = DateTime.Now,
                 AssignedAt = DateTime.Now,
-               AssignedToID = ComplaintTypeDB.Workflows.First().UserId
+               AssignedToID = ComplaintTypeDB.Workflows.First().UserId,
+               Title = complaintDto.Title,
+              
 
             };
+         
             complaint.CurrentStepID = firstWorkflow.Id;
-            //complaint.UserID = userId;
-            //complaint.Status = "Pending";
-
-            // جيب أول Workflow للـ ComplaintType
-
 
             await _complaintRepository.AddAsync(complaint);
             return (true, Array.Empty<string>());
@@ -87,7 +85,7 @@ namespace ComplaintSystem.Service.Services
             paginatedList.items= complaints.Select(c => new ComplaintDTO {
                 Id = c.Id,
                  Status = c.Status.ToString(),
-                 Description = c.Description,
+                 Title = c.Title,
                  ComplaintTypeName = c.ComplaintType?.TypeName
                  }).ToList();
             return paginatedList;
@@ -125,7 +123,7 @@ namespace ComplaintSystem.Service.Services
             {
                 Id = c.Id,
                 Status = c.Status.ToString(),
-                Description = c.Description,
+                Title = c.Title,
                 ComplaintTypeName = c.ComplaintType?.TypeName
             }).ToList();
             return paginatedList;

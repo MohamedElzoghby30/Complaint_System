@@ -29,7 +29,8 @@ namespace ComplaintSystem.API.Controllers
         private readonly Token _tokenService;
         private readonly IAccountService _accountService;
         private readonly IRoleService _roleService;
-        public AccountController(IAccountService accountService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, Token tokenService, IConfiguration configuration, RoleManager<Role> roleManager, IRoleService roleService)
+        private readonly IEmailService _emailService;
+        public AccountController(IAccountService accountService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, Token tokenService, IConfiguration configuration, RoleManager<Role> roleManager, IRoleService roleService,IEmailService emailService)
         {
             _accountService = accountService;
             _userManager = userManager;
@@ -38,6 +39,7 @@ namespace ComplaintSystem.API.Controllers
             _roleManager = roleManager;
             _tokenService = tokenService;
             _roleService = roleService;
+            _emailService = emailService;
         }
       
 
@@ -81,6 +83,40 @@ namespace ComplaintSystem.API.Controllers
             var token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
             Console.WriteLine(token);
             return Ok(new { token });
+        }
+        [HttpPost("forgot-password")] // POST : /api/accounts/ forgot-password
+        public async Task<ActionResult<string>> ForgetPassword([FromBody] ForgotPasswordDto model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user is null)
+                return Ok("If the email exists, a reset link will be sent.");
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var encodedToken = Uri.EscapeDataString(token);
+            var resetLink = $"https://your-frontend-url/reset-password?email={model.Email}&token={encodedToken}";
+
+            await _emailService.SendEmailAsync(
+                to: model.Email,
+                subject: "Reset Your Password",
+                body: $"<p>Click <a href='{resetLink}'>here</a> to reset your password.</p>"
+            );
+
+            return Ok("Reset password link sent.");
+        }
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+                return BadRequest("Invalid request");
+
+            var decodedToken = Uri.UnescapeDataString(model.Token); 
+            var result = await _userManager.ResetPasswordAsync(user, decodedToken, model.NewPassword);
+
+            if (!result.Succeeded)
+                return BadRequest(result.Errors);
+
+            return Ok("Password reset successfully.");
         }
 
         [HttpGet("GetUsers")]

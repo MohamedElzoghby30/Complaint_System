@@ -1,7 +1,10 @@
 
 using ComplaintSystem.Api.Extension;
 using ComplaintSystem.Core.Entities;
+using ComplaintSystem.Core.Serveice.Contract;
 using ComplaintSystem.Repo.Data;
+using ComplaintSystem.Service.Services;
+using ComplaintSystem.Service;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -21,6 +24,8 @@ namespace ComplaintSystem.Api
                 options.UseSqlServer(
                 builder.Configuration.GetConnectionString("DefaultConnection"));
             });
+          
+
             // config IfileProfider
 
             var webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
@@ -30,6 +35,8 @@ namespace ComplaintSystem.Api
             builder.Services.AddJwtIdentity(builder.Configuration)
                             .AddInfrastractureService()
                             .AddSwaggerDocumentation();
+            builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+            builder.Services.AddTransient<IEmailService, EmailService>();
 
             builder.Services.AddCors(options =>
             {
