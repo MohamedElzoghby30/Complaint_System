@@ -92,7 +92,8 @@ namespace ComplaintSystem.Repo.Repository
             return await _context.Complaints
                 .Include(c => c.User)
                 .Include(c => c.ComplaintType)
-               // .Include(c => c.Comments)
+               .Include(c => c.CommentsComplainer)
+               .Include(c=>c.Attachments)
                 .FirstOrDefaultAsync(x => x.Id == id && x.UserID == userId);
         }
         public async Task<Complaint> GetComplaintByIWithEmployeedAsync(int id,int UserId)

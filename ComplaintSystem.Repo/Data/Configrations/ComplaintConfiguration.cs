@@ -17,14 +17,14 @@ namespace ComplaintSystem.Repo.Data.Configrations
         {
 
 
-            // تعيين المفتاح الأساسي
+            
             builder.HasKey(c => c.Id);
 
             builder
             .Property(t => t.Status)
                 .HasConversion<string>();
 
-            // تعيين الحقول المطلوبة وطولها
+           
             builder.Property(c => c.Status)
                    .IsRequired()
                    .HasMaxLength(50);
@@ -58,42 +58,14 @@ namespace ComplaintSystem.Repo.Data.Configrations
                    .HasForeignKey(c => c.AssignedToID)
                    .OnDelete(DeleteBehavior.Restrict);
 
-            // تعيين العلاقة مع Comments
-            //builder.HasMany(c => c.Comments)
-            //       .WithOne(cm => cm.Complaint)
-            //       .HasForeignKey(cm => cm.ComplaintID)
-            //       .OnDelete(DeleteBehavior.Cascade);
+            builder
+                   .HasMany(c => c.Attachments)
+                      .WithOne(a => a.Complaint)
+                   .HasForeignKey(a => a.ComplaintId)
+                  .OnDelete(DeleteBehavior.Cascade);
 
+           
 
-            // تعيين العلاقة مع ComplaintParticipants
-            //builder.HasMany(c => c.Participants)
-            //       .WithOne(cp => cp.Complaint)
-            //       .HasForeignKey(cp => cp.ComplaintID)
-            //       .OnDelete(DeleteBehavior.Cascade);
-
-
-
-
-
-
-
-
-            //builder.Property(com => com.CommentText)
-            //       .IsRequired();
-
-
-
-            //// العلاقة مع Complaint
-            //builder.HasOne(com => com.Complaint)
-            //       .WithMany(c => c.Comments)
-            //       .HasForeignKey(com => com.ComplaintID)
-            //       .OnDelete(DeleteBehavior.Restrict);
-
-            //// العلاقة مع ComplaintParticipant
-            //builder.HasOne(com => com.Participant)
-            //       .WithMany()
-            //       .HasForeignKey(com => com.ParticipantID)
-            //       .OnDelete(DeleteBehavior.Restrict);
 
         }
     }

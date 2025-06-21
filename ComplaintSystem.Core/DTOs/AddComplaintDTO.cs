@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Microsoft.AspNetCore.Http;
 namespace ComplaintSystem.Core.DTOs
 {
     public class AddComplaintDTO
@@ -19,6 +19,7 @@ namespace ComplaintSystem.Core.DTOs
         [Required(ErrorMessage = "Description is required.")]
         [StringLength(2000, MinimumLength = 1, ErrorMessage = "Description must be between 1 and 2000 characters.")]
         public string Title { get; set; }
+         public List<IFormFile> Attachments { get; set; }
 
 
     }

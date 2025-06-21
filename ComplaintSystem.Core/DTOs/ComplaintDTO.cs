@@ -27,6 +27,7 @@ namespace ComplaintSystem.Core.DTOs
         [StringLength(2000, MinimumLength = 1, ErrorMessage = "Description must be between 1 and 2000 characters.")]
         public string Description { get; set; }
         public List<CommentDTO>? Comments { get; set; } = new();
+        public List<string>? Attachments { get; set; } = new();
 
     }
 }

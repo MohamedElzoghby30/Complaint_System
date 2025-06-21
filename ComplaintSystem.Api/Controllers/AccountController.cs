@@ -7,13 +7,7 @@ using ComplaintSystem.Core.Entities;
 using ComplaintSystem.Core.Serveice.Contract;
 using ComplaintSystem.Core.DTOs;
 using Microsoft.AspNetCore.Authorization;
-using ComplaintSystem.Service.Services;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using ComplaintSystem.Api;
 using Microsoft.EntityFrameworkCore;
 
@@ -85,7 +79,7 @@ namespace ComplaintSystem.API.Controllers
             Console.WriteLine(token);
             return Ok(new { token });
         }
-        [HttpPost("forgot-password")] // POST : /api/accounts/ forgot-password
+        [HttpPost("forgot-password")] 
         public async Task<ActionResult<string>> ForgetPassword([FromBody] ForgotPasswordDto model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
@@ -135,7 +129,8 @@ namespace ComplaintSystem.API.Controllers
                 FullName = Profile.FullName,
                 Email = Profile.Email,
                 PhoneNumber= Profile.PhoneNumber,
-               // Address= Profile.Address
+                Address= Profile.Address,
+                ImageURL= Profile.ImageUrl
             };
 
             return Ok(user);
@@ -154,12 +149,52 @@ namespace ComplaintSystem.API.Controllers
                 Profile.FullName = updateUserDTO.FullName;
                 Profile.Email = updateUserDTO.Email;
                 Profile.PhoneNumber = updateUserDTO.PhoneNumber;
-                //Profile.Address= updateUserDTO.Address
+            Profile.Address = updateUserDTO.Address;
            var result = await _userManager.UpdateAsync(Profile);
           
             if(!result.Succeeded)
                 return BadRequest(result.Errors);
             return Ok("Profile Updated ");
+        }
+
+        [HttpPost("upload-image-Profile")]
+        [Authorize(Roles = "Admin,Complainer,Employee")]
+        public async Task<IActionResult> UploadImage(IFormFile image)
+        {
+            if (image == null || image.Length == 0)
+                return BadRequest("No image uploaded.");
+
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await image.CopyToAsync(stream);
+            }
+
+            var imageUrl = $"{Request.Scheme}://{Request.Host}/images/{uniqueFileName}";
+
+
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return Unauthorized();
+            if (!int.TryParse(userIdClaim.Value, out var userId))
+                return Unauthorized("Unable to determine current user ID.");
+
+            
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+                return NotFound("User not found.");
+
+            user.ImageUrl = imageUrl;
+            await _userManager.UpdateAsync(user);
+
+            return Ok(new { imageUrl });
         }
 
         [HttpGet("GetUsers")]
@@ -317,87 +352,4 @@ namespace ComplaintSystem.API.Controllers
         }
 
     }
-    //  [HttpPost("login")]
-
-    //public async Task<IActionResult> Login(LoginDTO model)
-    //{
-    //    if (!ModelState.IsValid)
-    //        return BadRequest(new { Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
-
-    //    (string? token, string[] errors) = await _accountService.LoginAsync(model);
-    //    if (token == null)
-    //        return BadRequest(new { Errors = errors });
-
-    //    return Ok(new { Token = token, Message = "User logged in successfully" });
-    //}
-
-
-
-
-
-    // لو عايز تستخدم TokenResponseDTO:
-    // return Ok(new TokenResponseDTO { Token = token, Message = "User logged in successfully" });
-    //    private readonly UserManager<User> _userManager;
-    //    private readonly RoleManager<Role> _roleManager;
-    //    private readonly IMapper _mapper;
-
-    //    public AccountController(UserManager<User> userManager, RoleManager<Role> roleManager,IMapper mapper)
-    //    {
-    //        _userManager = userManager;
-    //        _roleManager = roleManager;
-    //        _mapper = mapper;
-    //    }
-
-    //    [HttpPost("register")]
-    //    public async Task<IActionResult> Register(RegestrationDTO model)
-    //    {
-    //        if (!ModelState.IsValid)
-    //            return BadRequest(ModelState);
-
-    //        // Check if user already exists
-    //        var existingUser = await _userManager.FindByEmailAsync(model.Email);
-    //        if (existingUser != null)
-    //            return BadRequest(" Email already exists.");
-
-    //        // Create new user
-    //        //mapping
-    //        //var user = new User
-    //        //{
-    //        //    FullName = model.FullName,
-    //        //    Email = model.Email,
-    //        //    DepartmentID = model.DepartmentID,
-    //        //    UserName=model.Email
-    //        //};
-    //        var user = _mapper.Map<User>(model);
-
-    //        var resultCreate = await _userManager.CreateAsync(user, model.Password);
-    //        if (!resultCreate.Succeeded)
-    //            return BadRequest(resultCreate.Errors);
-
-    //        // Assign the role 'Complainer' by default
-    //        if (!await _roleManager.RoleExistsAsync("Complainer"))
-    //            return BadRequest("Complainer role doesn't exist.");
-
-    //       var result =  await _userManager.AddToRoleAsync(user, "Complainer");
-    //        if (!result.Succeeded)
-    //            return BadRequest(result.Errors);
-
-    //        return Ok("User registered successfully with Complainer role.");
-    //    }
-    //    [HttpPost("login")]
-    //    public async Task<IActionResult> Login(LoginDTO model)
-    //    {
-    //        if (!ModelState.IsValid)
-    //            return BadRequest(ModelState);
-    //        var existingUser = await _userManager.FindByEmailAsync(model.Email);
-    //        if (existingUser == null || !await _userManager.CheckPasswordAsync(existingUser, model.Password))
-    //            return BadRequest(" Email OR Password is Wrong");
-    //        else
-    //            return Ok("User Login successfully");
-
-    //    }
-    //}
-
 }
-
-

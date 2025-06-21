@@ -30,19 +30,27 @@ namespace ComplaintSystem.Api.Controllers
 
         [Authorize(Roles = "Complainer")]
         [HttpPost("createComplaint")]
-        public async Task<IActionResult> CreateComplaint([FromBody] AddComplaintDTO complaintDto)
+        [Consumes("multipart/form-data")] 
+        public async Task<IActionResult> CreateComplaint([FromForm] AddComplaintDTO complaintDto)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new { Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                return BadRequest(new
+                {
+                    Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                });
 
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            (bool succeeded, string[] errors) = await _complaintService.CreateComplaintAsync(complaintDto, userId);
+
+            var (succeeded, errors) = await _complaintService.CreateComplaintAsync(complaintDto, userId);
 
             if (!succeeded)
                 return BadRequest(new { Errors = errors });
 
-            return Ok();
+            return Ok(new { Message = "Complaint submitted successfully." });
         }
+
+       
+
         [HttpGet("MyComplaints")]
         [Authorize(Roles = "Complainer")]
         public async Task<ActionResult<IEnumerable<ComplaintDTO>>> GetMyComplaints([FromQuery] ComplaintStatus status,int? PageNumber,int? PageSize )

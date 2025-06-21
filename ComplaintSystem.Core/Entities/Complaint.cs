@@ -38,12 +38,14 @@ namespace ComplaintSystem.Core.Entities
         public Rating? Rating { get; set; }
         public ICollection<CommentComplainer>? CommentsComplainer { get; set; }
         public ICollection<Workflow>? Workflows { get; set; }
+        public ICollection<ComplaintAttachment>? Attachments { get; set; } = new List<ComplaintAttachment>();
 
-       // public ICollection<ComplaintParticipant>? Participants { get; set; } = new List<ComplaintParticipant>();
-       // public ICollection<Comment>? Comments { get; set; } = new List<Comment>();
 
-        
-     
+        // public ICollection<ComplaintParticipant>? Participants { get; set; } = new List<ComplaintParticipant>();
+        // public ICollection<Comment>? Comments { get; set; } = new List<Comment>();
+
+
+
     }
     public enum ComplaintStatus
     {

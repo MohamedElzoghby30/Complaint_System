@@ -4,6 +4,7 @@ using ComplaintSystem.Repo.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ComplaintSystem.Repo.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250621163123_AddImageURLAndAddress")]
+    partial class AddImageURLAndAddress
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -190,32 +193,6 @@ namespace ComplaintSystem.Repo.Migrations
                     b.HasIndex("UserID");
 
                     b.ToTable("Complaints");
-                });
-
-            modelBuilder.Entity("ComplaintSystem.Core.Entities.ComplaintAttachment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ComplaintId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("CreatAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FileUrl")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ComplaintId");
-
-                    b.ToTable("ComplaintAttachment");
                 });
 
             modelBuilder.Entity("ComplaintSystem.Core.Entities.ComplaintType", b =>
@@ -534,17 +511,6 @@ namespace ComplaintSystem.Repo.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ComplaintSystem.Core.Entities.ComplaintAttachment", b =>
-                {
-                    b.HasOne("ComplaintSystem.Core.Entities.Complaint", "Complaint")
-                        .WithMany("Attachments")
-                        .HasForeignKey("ComplaintId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Complaint");
-                });
-
             modelBuilder.Entity("ComplaintSystem.Core.Entities.ComplaintType", b =>
                 {
                     b.HasOne("ComplaintSystem.Core.Entities.Department", "Department")
@@ -668,8 +634,6 @@ namespace ComplaintSystem.Repo.Migrations
 
             modelBuilder.Entity("ComplaintSystem.Core.Entities.Complaint", b =>
                 {
-                    b.Navigation("Attachments");
-
                     b.Navigation("CommentsComplainer");
 
                     b.Navigation("Rating");

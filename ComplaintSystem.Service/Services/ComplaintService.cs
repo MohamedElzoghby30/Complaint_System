@@ -1,8 +1,10 @@
-﻿using ComplaintSystem.Core;
+﻿using Azure.Core;
+using ComplaintSystem.Core;
 using ComplaintSystem.Core.DTOs;
 using ComplaintSystem.Core.Entities;
 using ComplaintSystem.Core.Repository.Contract;
 using ComplaintSystem.Core.Serveice.Contract;
+
 
 namespace ComplaintSystem.Service.Services
 {
@@ -28,33 +30,64 @@ namespace ComplaintSystem.Service.Services
                 return (false, new[] { "Invalid ComplaintTypeID." });
 
             var ComplaintTypeDB = await _complaintTypeRepository.GetComplaintTypeByIdAsync(complaintDto.ComplaintTypeID);
-            
+            var firstWorkflow = ComplaintTypeDB.Workflows.FirstOrDefault();
 
-            var firstWorkflow = ComplaintTypeDB.Workflows.First();
             if (firstWorkflow == null)
                 return (false, new[] { "No workflow defined for this complaint type." });
 
-           
-            // var complaint = _mapper.Map<Complaint>(complaintDto);
             var complaint = new Complaint()
             {
                 Description = complaintDto.Description,
-                ComplaintTypeID=complaintDto.ComplaintTypeID,
+                ComplaintTypeID = complaintDto.ComplaintTypeID,
                 UserID = userId,
                 Status = ComplaintStatus.Pending,
                 CreatAt = DateTime.Now,
                 AssignedAt = DateTime.Now,
-               AssignedToID = ComplaintTypeDB.Workflows.First().UserId,
-               Title = complaintDto.Title,
-              
-
+                AssignedToID = firstWorkflow.UserId,
+                Title = complaintDto.Title,
+                CurrentStepID = firstWorkflow.Id,
+                Attachments = new List<ComplaintAttachment>()
             };
-         
-            complaint.CurrentStepID = firstWorkflow.Id;
+
+            
+            if (complaintDto.Attachments != null && complaintDto.Attachments.Any())
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+
+                foreach (var file in complaintDto.Attachments)
+                {
+                    if (file.Length > 0)
+                    {
+                        var allowedExtensions = new[] { ".jpg", ".png", ".pdf", ".docx", ".xlsx" };
+                        var extension = Path.GetExtension(file.FileName).ToLower();
+
+                        if (!allowedExtensions.Contains(extension))
+                            return (false, new[] { $"File type not allowed: {extension}" });
+
+                        var uniqueFileName = Guid.NewGuid().ToString() + extension;
+                        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+
+                        var fileUrl = $"https://complain.runasp.net/uploads/{uniqueFileName}"; 
+                        complaint.Attachments.Add(new ComplaintAttachment
+                        {
+                            FileUrl = fileUrl
+                        });
+                    }
+                }
+            }
 
             await _complaintRepository.AddAsync(complaint);
             return (true, Array.Empty<string>());
         }
+
         public async Task<PaginatedListCore<Complaint,ComplaintDTO>> GetComplaintsForUserAsync(int userId, ComplaintStatus status=ComplaintStatus.Pending, int pageNumber=0,int PageSize=0)
 
         {
@@ -162,6 +195,7 @@ namespace ComplaintSystem.Service.Services
                     UserId = c.UserId,
                     UserEmail = c.User?.Email 
                 }).ToList(),
+                Attachments = complaintDB.Attachments.Select(a => a.FileUrl).ToList()
 
                
             };
