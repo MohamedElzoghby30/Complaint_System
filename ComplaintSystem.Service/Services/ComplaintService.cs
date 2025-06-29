@@ -193,7 +193,7 @@ namespace ComplaintSystem.Service.Services
                     Text = c.CommentText,
                     CreatedAt = c.CreatAt,
                     UserId = c.UserId,
-                    UserEmail = c.User?.Email 
+                    FullName = c.User?.FullName 
                 }).ToList(),
                 Attachments = complaintDB.Attachments.Select(a => a.FileUrl).ToList()
 

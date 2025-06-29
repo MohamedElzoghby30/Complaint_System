@@ -28,7 +28,7 @@ namespace ComplaintSystem.Api.Controllers
             _commentService = commentService;
         }
 
-        [Authorize(Roles = "Complainer")]
+        [Authorize(Roles = "Admin,Complainer,Employee")]
         [HttpPost("createComplaint")]
         [Consumes("multipart/form-data")] 
         public async Task<IActionResult> CreateComplaint([FromForm] AddComplaintDTO complaintDto)
@@ -52,7 +52,7 @@ namespace ComplaintSystem.Api.Controllers
        
 
         [HttpGet("MyComplaints")]
-        [Authorize(Roles = "Complainer")]
+        [Authorize(Roles = "Admin,Complainer,Employee")]
         public async Task<ActionResult<IEnumerable<ComplaintDTO>>> GetMyComplaints([FromQuery] ComplaintStatus status,int? PageNumber,int? PageSize )
         {
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
@@ -70,7 +70,7 @@ namespace ComplaintSystem.Api.Controllers
 
         }
         [HttpGet("AssingedComplaints")]
-        [Authorize(Roles = "Complainer")]
+        [Authorize(Roles = "Admin,Employee")]
         public async Task<ActionResult<IEnumerable<ComplaintDTO>>> AssingedComplaints([FromQuery] ComplaintStatus status, int? PageNumber, int? PageSize)
         {
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
@@ -88,7 +88,7 @@ namespace ComplaintSystem.Api.Controllers
 
         }
         [HttpGet("GetComplaintByID")]
-        [Authorize(Roles = "Complainer")]
+        [Authorize(Roles = "Admin,Complainer,Employee")]
         public async Task<IActionResult> GetComplaint(int id)
         {
 
@@ -128,7 +128,7 @@ namespace ComplaintSystem.Api.Controllers
             return Ok("Successfully evaluated");
         }
         [HttpPut("Escalate")]
-        [Authorize]
+        [Authorize(Roles = "Admin,Employee")]
         public async Task<IActionResult> EscalateComplaintWorkflow([FromQuery] EscalateDTO escalateDTO)
         {
             var userIdClaim = int.Parse((User.FindFirst(ClaimTypes.NameIdentifier)).Value);
@@ -168,7 +168,7 @@ namespace ComplaintSystem.Api.Controllers
         }
 
         [HttpPut("EditStatus")]
-        [Authorize]
+        [Authorize(Roles = "Admin,Employee")]
         public async Task<IActionResult> EditStatus([FromBody] UpdateComplaintStatusDTO dto)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);

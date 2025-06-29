@@ -41,5 +41,17 @@ namespace ComplaintSystem.Api.Controllers
             return Ok(result);
         }
 
+        [HttpPost("Update-ComplaintType")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<ComplaintTypeUpdateDTO>> UpdateComplaintType([FromBody] ComplaintTypeUpdateDTO dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var result = await _complaintTypeService.UpdateComplaintTypesAsync(dto);
+            if(result == null)
+                return NotFound(new { message = "Complaint type not found" });
+            return Ok(result);
+        }
+
     }
 }

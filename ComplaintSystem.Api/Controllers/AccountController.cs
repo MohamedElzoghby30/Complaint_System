@@ -88,7 +88,7 @@ namespace ComplaintSystem.API.Controllers
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             var encodedToken = Uri.EscapeDataString(token);
-            var resetLink = $"https://your-frontend-url/reset-password?email={model.Email}&token={encodedToken}";
+            var resetLink = $"https://easy-complaint-app.vercel.app/recoverpassword?email={model.Email}&token={encodedToken}";
 
             await _emailService.SendEmailAsync(
                 to: model.Email,
@@ -216,7 +216,7 @@ namespace ComplaintSystem.API.Controllers
                 foreach (var user in allUsers)
                 {
                     var roles = await _userManager.GetRolesAsync(user);
-                    if (roles == null || !roles.Any())
+            
                         filteredUsers.Add(user);
                 }
             }

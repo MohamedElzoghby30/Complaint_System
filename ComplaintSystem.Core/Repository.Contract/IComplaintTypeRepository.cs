@@ -1,4 +1,5 @@
-﻿using ComplaintSystem.Core.Entities;
+﻿using ComplaintSystem.Core.DTOs;
+using ComplaintSystem.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,6 @@ namespace ComplaintSystem.Core.Repository.Contract
         Task<ComplaintType> AddAsync(ComplaintType complaintType);
         Task<ComplaintType> GetComplaintTypeByIdAsync(int ComplaintTypeId);
         Task<IEnumerable<ComplaintType>> GetAllAsync();
+       Task<ComplaintTypeUpdateDTO> UpdateComplaintTypeAsnc(ComplaintTypeUpdateDTO dto);
     }
 }

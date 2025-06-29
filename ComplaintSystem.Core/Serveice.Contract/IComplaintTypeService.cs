@@ -13,5 +13,6 @@ namespace ComplaintSystem.Core.Serveice.Contract
     {
         Task<ComplaintTypeDTO> AddComplaintTypeAsync(ComplaintTypeDTO complaintTypeDTO);
         Task<IEnumerable<GetComplaintTypeDTO>> GetAllComplaintTypesAsync();
+        Task<ComplaintTypeUpdateDTO> UpdateComplaintTypesAsync(ComplaintTypeUpdateDTO dto);
     }
 }

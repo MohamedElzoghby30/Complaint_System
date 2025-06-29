@@ -36,6 +36,12 @@ namespace ComplaintSystem.Service.Services
                 DepartmentID = result.DepartmentID
             };
         }
+        public async Task<ComplaintTypeUpdateDTO> UpdateComplaintTypesAsync(ComplaintTypeUpdateDTO dto)
+        {
+            var ComplaintType = await _repo.UpdateComplaintTypeAsnc(dto);
+
+            return ComplaintType;
+        }
 
         public async Task<IEnumerable<GetComplaintTypeDTO>> GetAllComplaintTypesAsync()
         {
