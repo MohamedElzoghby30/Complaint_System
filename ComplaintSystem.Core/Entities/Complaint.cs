@@ -50,7 +50,7 @@ namespace ComplaintSystem.Core.Entities
     public enum ComplaintStatus
     {
         Pending = 0,
-        InProgress =1,
+        InProgress =1, 
         Escalated = 2,
         Dropped = 3,
         Resolved = 4

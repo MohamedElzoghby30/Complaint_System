@@ -43,7 +43,7 @@ namespace ComplaintSystem.Repo.Repository
         }
         public async Task<IEnumerable<ComplaintType>> GetAllAsync()
         {
-            return await _context.ComplaintTypes.Include(c => c.Department).ToListAsync();
+            return await _context.ComplaintTypes.Include(c => c.Department).Include(x=>x.Workflows).ToListAsync();
         }
 
         public async Task<ComplaintType> GetComplaintTypeByIdAsync(int ComplaintTypeId)

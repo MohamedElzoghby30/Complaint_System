@@ -9,6 +9,7 @@ namespace ComplaintSystem.Core.Serveice.Contract
 {
     public interface ICommentService
     {
-        Task<bool> AddCommentAsync(AddCommentDTO dto, int ParticipantId);
+        Task<bool> AddCommentForEmployeeAsync(AddCommentDTO dto, int ParticipantId);
+        Task<bool> AddCommentForUserAsync(AddCommentDTO dto, int UserID);
     }
 }

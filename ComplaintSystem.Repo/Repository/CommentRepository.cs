@@ -19,14 +19,15 @@ namespace ComplaintSystem.Repo.Repository
         }
         public async Task<bool> AddCommentAsync(CommentComplainer comment)
         {
-            //await  _context.Comments.AddAsync(comment);
-
-            ////await _context.SaveChangesAsync();
-            //_context.SaveChanges();
+           
             await _context.CommentComplainers.AddAsync(comment);
             await _context.SaveChangesAsync();
 
             return true;
         }
+
+        public async Task<IEnumerable<CommentComplainer>> GetCommentsForComplaintAsync(int Id)=>
+             _context.CommentComplainers.Where(x=>x.ComplaintID==Id).Include(x=>x.User).ToList();
+       
     }
 }

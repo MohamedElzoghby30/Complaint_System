@@ -46,14 +46,22 @@ namespace ComplaintSystem.Service.Services
         public async Task<IEnumerable<GetComplaintTypeDTO>> GetAllComplaintTypesAsync()
         {
             var list = await _repo.GetAllAsync();
-
-            return list.Select(x => new GetComplaintTypeDTO
+            var response= new List<GetComplaintTypeDTO>();
+            foreach (var item in list)
             {
-                Id = x.Id,
-                TypeName = x.TypeName,
-                DepartmentID = x.DepartmentID,
-                DepartmentName=x.Department.DepartmentName
-            });
+                if (item.Workflows != null)
+                {
+                  response.Add(new GetComplaintTypeDTO
+                    {
+                        Id = item.Id,
+                        TypeName = item.TypeName,
+                        DepartmentID = item.DepartmentID,
+                        DepartmentName = item.Department.DepartmentName
+                    });
+                }
+            }
+
+            return response;
         }
     }
 }

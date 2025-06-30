@@ -17,10 +17,17 @@ namespace ComplaintSystem.Repo.Data.Configrations
             builder.HasKey(ct => ct.Id);
 
             builder.Property(ct => ct.TypeName)
+                   .IsRequired();
+
+            builder.HasIndex(ct => ct.TypeName)
+                   .IsUnique();
+
+
+            builder.Property(ct => ct.TypeName)
                    .IsRequired()
                    .HasMaxLength(100);
 
-            // تعيين العلاقة مع Department
+           
             builder.HasOne(ct => ct.Department)
                    .WithMany(d => d.ComplaintTypes)
                    .HasForeignKey(ct => ct.DepartmentID)

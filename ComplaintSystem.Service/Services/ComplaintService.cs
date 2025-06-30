@@ -12,12 +12,13 @@ namespace ComplaintSystem.Service.Services
     {
         private readonly IComplaintRepository _complaintRepository;
         private readonly IComplaintTypeRepository _complaintTypeRepository;
-      //  private readonly IMapper _mapper;
-
-        public ComplaintService(IComplaintRepository complaintRepository, IComplaintTypeRepository complaintTypeRepository)
+        //  private readonly IMapper _mapper;
+        private readonly ICommentRepository _commentRepository;
+        public ComplaintService(IComplaintRepository complaintRepository, IComplaintTypeRepository complaintTypeRepository,ICommentRepository commentRepository)
         {
             _complaintRepository = complaintRepository;
             _complaintTypeRepository = complaintTypeRepository;
+            _commentRepository = commentRepository;
           //  _mapper = mapper;
         }
 
@@ -175,10 +176,11 @@ namespace ComplaintSystem.Service.Services
         }
 
 
-        public async Task<ComplaintDTO> GetComplaintAsync(int id, int userId)
+        public async Task<ComplaintDTO> GetComplaintEmployeeAdminAsync(int id, int userId)
         {
             var complaintDB = await _complaintRepository.GetComplaintByIdAsync(id, userId);
             if (complaintDB == null) return null;
+            var CommentsDb = await _commentRepository.GetCommentsForComplaintAsync(id);
 
             return new ComplaintDTO
             {
@@ -187,7 +189,7 @@ namespace ComplaintSystem.Service.Services
                 Description = complaintDB.Description,
                 ComplaintTypeName = complaintDB.ComplaintType?.TypeName,
                 Title = complaintDB.Title,
-                Comments= complaintDB.CommentsComplainer.Select(c => new CommentDTO
+                Comments= CommentsDb.Select(c => new CommentDTO
                 {
                     Id = c.Id,
                     Text = c.CommentText,
@@ -198,6 +200,32 @@ namespace ComplaintSystem.Service.Services
                 Attachments = complaintDB.Attachments.Select(a => a.FileUrl).ToList()
 
                
+            };
+        }
+        public async Task<ComplaintDTO> GetComplaintUserAsync(int id, int userId)
+        {
+            var complaintDB = await _complaintRepository.GetComplaintByIdAsync(id, userId);
+            if (complaintDB == null) return null;
+            var CommentsDb=  await _commentRepository.GetCommentsForComplaintAsync(id);
+
+            return new ComplaintDTO
+            {
+                Id = complaintDB.Id,
+                Status = complaintDB.Status.ToString(),
+                Description = complaintDB.Description,
+                ComplaintTypeName = complaintDB.ComplaintType?.TypeName,
+                Title = complaintDB.Title,
+                Comments = CommentsDb.Where(x=>x.IsForUser==true).Select(c => new CommentDTO
+                {
+                    Id = c.Id,
+                    Text = c.CommentText,
+                    CreatedAt = c.CreatAt,
+                    UserId = c.UserId,
+                    FullName = c.User?.FullName
+                }).ToList(),
+                Attachments = complaintDB.Attachments.Select(a => a.FileUrl).ToList()
+
+
             };
         }
 

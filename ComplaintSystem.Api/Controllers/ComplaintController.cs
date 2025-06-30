@@ -95,8 +95,23 @@ namespace ComplaintSystem.Api.Controllers
             if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId) || userId == 0) 
                 return Unauthorized();
 
-            var complaint = await _complaintService.GetComplaintAsync(id, userId);
+            var role = User.FindFirst(ClaimTypes.Role).Value;
+            var complaint = new ComplaintDTO();
 
+
+            if (role== "Complainer")
+            {
+                 complaint = await _complaintService.GetComplaintUserAsync(id, userId);
+            }
+            
+            else if(role== "Admin"||role== "Employee")
+            {
+                complaint = await _complaintService.GetComplaintEmployeeAdminAsync(id, userId);
+            }
+            else
+            {
+                return Unauthorized();
+            }
             if (complaint == null)
                 return NotFound(new { message = "Complaint not found or not yours." });
 
@@ -159,7 +174,7 @@ namespace ComplaintSystem.Api.Controllers
                
                 CommentText = escalateDTO.Comment,
             };
-            var CommentRes = await _commentService.AddCommentAsync(Comment,UserDB.Id);
+            var CommentRes = await _commentService.AddCommentForEmployeeAsync(Comment,UserDB.Id);
              if (!CommentRes)
                 return BadRequest("Failed to add comment.");
 
