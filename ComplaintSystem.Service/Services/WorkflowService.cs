@@ -13,12 +13,14 @@ namespace ComplaintSystem.Service.Services
         private readonly IWorkflowRepo _repo;
         private readonly IComplaintTypeRepository _complaintTypeRepository;
         private readonly IUserRepository _userRepository;
-        public WorkflowService(ApplicationDbContext context, IWorkflowRepo repo, IComplaintTypeRepository complaintTypeRepository, IUserRepository userRepository)
+        private readonly IComplaintRepository _complaintRepository;
+        public WorkflowService(ApplicationDbContext context, IWorkflowRepo repo, IComplaintTypeRepository complaintTypeRepository, IUserRepository userRepository,IComplaintRepository complaintRepository)
         {
             _context = context;
             _repo = repo;
             _complaintTypeRepository = complaintTypeRepository;
             _userRepository = userRepository;
+            _complaintRepository = complaintRepository;
         }
 
         public async Task<IEnumerable<GetWorkflowStepDTO>> GetWorkflowsByComplaintTypeAsync(int complaintTypeId)
@@ -68,19 +70,84 @@ namespace ComplaintSystem.Service.Services
 
         public async Task<bool> DeleteWorkflowStepAsync(int workflowId)
         {
-            var workflow = await _repo.GetWorkflowByIdAsync(workflowId);
-            if (workflow == null) return false;
-            var complaintType = await _complaintTypeRepository.GetComplaintTypeByIdAsync(workflow.ComplaintTypeID);
+            var workflowCurrent = await _repo.GetWorkflowByIdAsync(workflowId);
+            if (workflowCurrent == null) return false;
+            var complaintType = await _complaintTypeRepository.GetComplaintTypeByIdAsync(workflowCurrent.ComplaintTypeID);
             if (complaintType == null) return false;
-            Workflow workflowLast = null;
-            if (complaintType.Workflows.Count != 0)
-            {
-                workflowLast = await _context.Workflows.FirstOrDefaultAsync(w => w.NextStepID == workflow.Id);
 
+           Workflow workflowBefore =  await _context.Workflows.FirstOrDefaultAsync(x=>x.NextStepID==workflowCurrent.Id);
+
+           Workflow workflowAfter = await _context.Workflows.FirstOrDefaultAsync(x=>x.Id == workflowCurrent.NextStepID);
+            var Complaints = await _complaintRepository.GetComplaintSByCurrentStep(workflowId);
+         
+            if (workflowBefore == null && workflowAfter == null)
+            {
+                // No previous or next step, just delete the workflow
+               
+                return false;
             }
-            var reslut = await _repo.DeleteWorkflow(workflow, workflowLast, complaintType);
-            return reslut;
-        }
+            else if (workflowBefore != null && workflowAfter != null)
+            {
+                // Both previous and next steps exist, update the links
+                
+                workflowBefore.NextStepID = workflowAfter.Id;
+                _context.Workflows.Update(workflowBefore);
+                await _context.SaveChangesAsync();
+               if(Complaints.Any())
+               {
+                    foreach (var complaint in Complaints)
+                    {
+                        complaint.CurrentStepID = workflowAfter.Id;
+                        complaint.AssignedToID = workflowAfter.UserId;
+                        complaint.AssignedAt = DateTime.Now;
+                    var x = await _complaintRepository.UpdateComplaintAsync(complaint);   
+                    }
+
+               }
+                var reslut = await _repo.DeleteWorkflow(workflowCurrent,  complaintType);
+                return reslut;
+            }
+            else if (workflowBefore == null && workflowAfter!=null)
+            {
+                // Only previous step exists, set its NextStepID to null
+                if (Complaints.Any())
+                {
+                    foreach (var complaint in Complaints)
+                    {
+                        complaint.CurrentStepID = workflowAfter.Id;
+                        complaint.AssignedToID = workflowAfter.UserId;
+                        complaint.AssignedAt = DateTime.Now;
+                        var x = await _complaintRepository.UpdateComplaintAsync(complaint);
+                    }
+
+                }
+                var reslut = await _repo.DeleteWorkflow(workflowCurrent, complaintType);
+                return reslut;
+            }
+            else
+            {
+                // Only next step exists, set its PreviousStepID to null
+
+                workflowBefore.NextStepID = null;
+                _context.Workflows.Update(workflowBefore);
+                await _context.SaveChangesAsync();
+                if (Complaints.Any())
+                {
+                    foreach (var complaint in Complaints)
+                    {
+                        complaint.CurrentStepID = workflowBefore.Id;
+                        complaint.AssignedToID = workflowBefore.UserId;
+                        complaint.AssignedAt = DateTime.Now;
+                        var x = await _complaintRepository.UpdateComplaintAsync(complaint);
+                    }
+
+                }
+                var reslut = await _repo.DeleteWorkflow(workflowCurrent, complaintType);
+                return reslut;
+            }
+           
+        }     
+        
 
         public async Task<bool> UpdateWorkflowUserAsync(int workflowId, string userEmail)
         {

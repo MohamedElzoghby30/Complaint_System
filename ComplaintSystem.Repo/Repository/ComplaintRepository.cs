@@ -106,8 +106,11 @@ namespace ComplaintSystem.Repo.Repository
         }
       public async Task<int> GetComlaintsNumByUserIdAsync(int id) => 
           await _context.Complaints.Where(c => c.UserID == id) .CountAsync();
-               
-               
-       
+
+        public async Task<IEnumerable<Complaint>> GetComplaintSByCurrentStep(int workfloId)=>
+             await _context.Complaints
+            .Where(c => c.CurrentStepID == workfloId)
+            .ToListAsync();
+        
     }
 }

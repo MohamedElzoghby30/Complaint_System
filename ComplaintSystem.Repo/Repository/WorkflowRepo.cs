@@ -50,16 +50,16 @@ namespace ComplaintSystem.Repo.Repository
             return true;
         }
 
-        public async Task< bool> DeleteWorkflow(Workflow workflow, Workflow workflowLast, ComplaintType complaintType)
+        public async Task< bool> DeleteWorkflow(Workflow workflow, ComplaintType complaintType)
         {
-            if (workflowLast != null)
-            {
-                workflowLast.NextStepID =workflow.NextStepID;
-                _context.Workflows.Update(workflowLast);
-            }
+            //if (workflowLast != null)
+            //{
+            //    workflowLast.NextStepID =workflow.NextStepID;
+            //    _context.Workflows.Update(workflowLast);
+            //}
             complaintType.Workflows.Remove(workflow);
             _context.Workflows.Remove(workflow);
-         await   _context.SaveChangesAsync();
+         await _context.SaveChangesAsync();
             return true;
         }
 

@@ -21,7 +21,7 @@ namespace ComplaintSystem.Core.Repository.Contract
         Task<IEnumerable<Complaint>> Assin(int userId, ComplaintStatus status, int pageNumber = 0, int pageSize = 0);
 
 
-
+        Task<IEnumerable<Complaint>> GetComplaintSByCurrentStep(int workfloId);
         Task<IEnumerable<Complaint>> GetByUserIdAsync(int userId,ComplaintStatus status);
 
         Task<Complaint> GetComplaintByIdAsync(int id, int userId);

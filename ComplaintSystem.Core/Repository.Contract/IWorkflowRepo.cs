@@ -14,8 +14,8 @@ namespace ComplaintSystem.Core.Repository.Contract
         Task<Workflow> GetWorkflowByIdAsync(int WorkfloId);
         Task<Workflow> AddWorkflowAsync(Workflow workflow, Workflow workflowLast,ComplaintType complaintType);
         Task<bool> AddWorkflowNextStepIdAsync(Workflow workflow, Workflow workflowLast, ComplaintType complaintType);
-        Task<bool> DeleteWorkflow(Workflow workflow,Workflow workflowLast, ComplaintType complaintType);
-         Task<bool> UpdateWorkflowUserAsync(int UserId, int worflowId);
+        Task<bool> DeleteWorkflow(Workflow workflow, ComplaintType complaintType);
+        Task<bool> UpdateWorkflowUserAsync(int UserId, int worflowId);
 
     }
 }
