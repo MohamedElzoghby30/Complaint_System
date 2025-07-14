@@ -22,18 +22,13 @@ namespace ComplaintSystem.Repo.Data
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             base.OnModelCreating(modelBuilder);
         }
-
         public DbSet<Complaint> Complaints { get; set; }
-      
-       // public DbSet<Comment> Comments { get; set; }
-      //  public DbSet<ComplaintParticipant> ComplaintParticipants { get; set; }
         public DbSet<ComplaintType> ComplaintTypes { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Workflow> Workflows { get; set; }
         public DbSet<Rating> Ratings { get; set; }
         public DbSet<CommentComplainer> CommentComplainers { get; set; }
-
-
+        public DbSet<WebSiteDetails> WebSiteDetails { get; set; }
 
     }
 }

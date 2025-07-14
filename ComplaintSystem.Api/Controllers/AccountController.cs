@@ -70,9 +70,6 @@ namespace ComplaintSystem.API.Controllers
                 return Unauthorized("The Passworrd is Not Valid");
             
 
-             var roles = await _userManager.GetRolesAsync(user);
-            if (!roles.Contains(model.Role))
-                return Unauthorized("User has no roles assigned.");
             
             var jwtToken = await _tokenService.CreateToken(user, _userManager);
             var token = new JwtSecurityTokenHandler().WriteToken(jwtToken);

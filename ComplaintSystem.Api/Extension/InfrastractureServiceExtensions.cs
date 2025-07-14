@@ -36,6 +36,8 @@ namespace ComplaintSystem.Api.Extension
             services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<ICommentRepository, CommentRepository>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IWebsiteInfo, WebsiteInfo>();
+            services.AddScoped<IWebsiteInfoService, WebsiteInfoService>();
           
 
 
